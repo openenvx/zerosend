@@ -1,0 +1,61 @@
+---
+title: Getting started
+description: Deploy zerosend and mint your first API key.
+icon: Play
+---
+
+## Prerequisites
+
+- [Bun](https://bun.sh)
+- A Cloudflare account (free tier works)
+- [Wrangler](https://developers.cloudflare.com/workers/wrangler/) v4
+
+## Deploy to Cloudflare (one-click)
+
+[![Deploy to Cloudflare](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/openenvx/zerosend)
+
+Cloudflare clones the repo, provisions D1 from `wrangler.jsonc`, prompts for `ADMIN_TOKEN` and `SESSION_SECRET`, runs migrations, and deploys the Worker. Full details: [DEPLOY.md](https://github.com/openenvx/zerosend/blob/main/DEPLOY.md).
+
+## Local setup
+
+```bash
+bun install
+cp apps/zerosend/.dev.vars.example apps/zerosend/.dev.vars
+```
+
+| Variable         | Purpose                                     |
+| ---------------- | ------------------------------------------- |
+| `ADMIN_TOKEN`    | Operator dashboard password                 |
+| `SESSION_SECRET` | JWT cookie signing (`openssl rand -hex 32`) |
+
+Wrangler loads `.dev.vars` automatically during local dev.
+
+## Run locally
+
+```bash
+bun run migrate
+bun run dev
+```
+
+- **Product:** [http://localhost:3001](http://localhost:3001)
+- **Landing + docs:** [http://localhost:3000](http://localhost:3000) (`bun run dev:landing`)
+
+Sign in at `/login` with your `ADMIN_TOKEN`, then open **Settings** to create an API key.
+
+## Call the API
+
+```bash
+export ZEROSEND_URL=http://localhost:3001
+export ZEROSEND_API_KEY=zs_live_…
+
+curl -sS "$ZEROSEND_URL/v1/me" \
+  -H "Authorization: Bearer $ZEROSEND_API_KEY"
+```
+
+## Manual deploy (Wrangler)
+
+See [DEPLOY.md](https://github.com/openenvx/zerosend/blob/main/DEPLOY.md):
+
+1. `wrangler login`
+2. `bun run deploy:with-migrations`
+3. Set `ADMIN_TOKEN` and `SESSION_SECRET` via `wrangler secret put` if needed

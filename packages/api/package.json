@@ -1,0 +1,36 @@
+{
+  "name": "@zerosend/api",
+  "type": "module",
+  "exports": {
+    ".": {
+      "default": "./src/index.ts"
+    },
+    "./auth": {
+      "default": "./src/auth/index.ts"
+    },
+    "./*": {
+      "default": "./src/*.ts"
+    }
+  },
+  "scripts": {
+    "test": "vitest run",
+    "check-types": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@orpc/client": "catalog:",
+    "@orpc/openapi": "catalog:",
+    "@orpc/server": "catalog:",
+    "@orpc/zod": "catalog:",
+    "@zerosend/db": "workspace:*",
+    "@zerosend/env": "workspace:*",
+    "dotenv": "catalog:",
+    "drizzle-orm": "^0.45.2",
+    "jose": "^6.2.10",
+    "zod": "catalog:"
+  },
+  "devDependencies": {
+    "@zerosend/config": "workspace:*",
+    "typescript": "catalog:",
+    "vitest": "^4.1.11"
+  }
+}

@@ -1,0 +1,20 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "zerosend",
+  "compatibility_date": "2026-08-25",
+  "compatibility_flags": ["nodejs_compat"],
+  "keep_vars": true,
+  "main": "apps/zerosend/dist/server/index.js",
+  "observability": {
+    "enabled": true,
+  },
+  // Used by the Deploy to Cloudflare button to auto-provision D1. Production deploy runs from apps/zerosend (see root package.json "deploy").
+  // Omit database_id so each account gets its own database. Do not commit account-specific IDs to a public template.
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "zerosend",
+      "migrations_dir": "packages/db/src/migrations",
+    },
+  ],
+}

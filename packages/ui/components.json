@@ -1,0 +1,26 @@
+{
+  "$schema": "https://ui.shadcn.com/schema.json",
+  "style": "base-lyra",
+  "rsc": false,
+  "tsx": true,
+  "tailwind": {
+    "config": "",
+    "css": "src/styles/globals.css",
+    "baseColor": "neutral",
+    "cssVariables": true,
+    "prefix": ""
+  },
+  "iconLibrary": "lucide",
+  "aliases": {
+    "components": "@zerosend/ui/components",
+    "utils": "@zerosend/ui/lib/utils",
+    "hooks": "@zerosend/ui/hooks",
+    "lib": "@zerosend/ui/lib",
+    "ui": "@zerosend/ui/components"
+  },
+  "menuColor": "default",
+  "menuAccent": "subtle",
+  "registries": {
+    "@xmazu": "https://xmazu-platforms-registry.quiet-grass-bffe.workers.dev/r/{name}.json"
+  }
+}

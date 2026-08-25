@@ -1,0 +1,20 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "zerosend",
+  "compatibility_date": "2026-08-25",
+  "compatibility_flags": ["nodejs_compat"],
+  "keep_vars": true,
+  "main": "@tanstack/react-start/server-entry",
+  "observability": {
+    "enabled": true,
+  },
+  // Omit database_id for one-click deploy; Cloudflare provisions D1 per account.
+  // After first deploy, copy the ID from the dashboard only if you need local `db:migrate:remote`.
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "zerosend",
+      "migrations_dir": "../../packages/db/src/migrations",
+    },
+  ],
+}

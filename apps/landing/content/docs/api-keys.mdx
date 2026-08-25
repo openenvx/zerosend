@@ -1,0 +1,38 @@
+---
+title: API keys
+description: How product apps authenticate to zerosend.
+icon: KeyRound
+---
+
+Zerosend uses two separate auth lanes on purpose:
+
+| Lane         | Who                  | Mechanism                             |
+| ------------ | -------------------- | ------------------------------------- |
+| Operator UI  | You                  | `ADMIN_TOKEN` → signed session cookie |
+| Product apps | Your Workers/servers | `Authorization: Bearer zs_live_…`     |
+
+Never put a send key in the browser as the only UI auth.
+
+## Create a key
+
+1. Sign in to the zerosend dashboard (`/login`)
+2. Open **Settings**
+3. Click **Create key** and copy the plaintext value — it is shown once
+
+Keys are stored as SHA-256 hashes in D1. Zerosend only ever shows the prefix after creation.
+
+## Use a key
+
+```ts
+await fetch(`${process.env.ZEROSEND_URL}/v1/me`, {
+  headers: {
+    Authorization: `Bearer ${process.env.ZEROSEND_API_KEY}`,
+  },
+});
+```
+
+Set `ZEROSEND_URL` and `ZEROSEND_API_KEY` in each product that sends mail through zerosend.
+
+## Revoke a key
+
+In **Settings**, revoke the key. Product apps using it lose access immediately.

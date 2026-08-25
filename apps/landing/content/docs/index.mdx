@@ -1,0 +1,25 @@
+---
+title: Introduction
+description: Self-hosted transactional email on Cloudflare.
+icon: Rocket
+---
+
+Zerosend is a self-hosted email platform you deploy once. Other products in your stack call it over HTTP with an API key — the same mental model as Resend, but on infrastructure you control.
+
+## What you get
+
+- **Operator dashboard** — sign in with an admin token, mint API keys, manage settings
+- **`/v1` REST** — send email, templates, events, and automations (phased rollout)
+- **One Worker** — dashboard, API, and background handlers share a single deploy
+
+## Quick example
+
+```bash
+curl -sS "$ZEROSEND_URL/v1/me" \
+  -H "Authorization: Bearer $ZEROSEND_API_KEY"
+```
+
+<Cards>
+  <Card title="Getting started" href="/docs/getting-started" />
+  <Card title="API keys" href="/docs/api-keys" />
+</Cards>
