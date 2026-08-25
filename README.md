@@ -98,11 +98,15 @@ curl -sS "$ZEROSEND_URL/v1/emails" \
   -H "Content-Type: application/json" \
   -d '{
     "from": "hello@example.com",
-    "to": "user@example.com",
+    "to": ["user@example.com", "other@example.com"],
+    "fromName": "Zerosend",
+    "replyTo": "support@example.com",
     "subject": "Hello from Zerosend",
     "html": "<p>It works.</p>"
   }'
 ```
+
+Responses include `X-RateLimit-Limit`, `X-RateLimit-Remaining`, and `X-RateLimit-Reset` (unix seconds). Repeat a send safely with `Idempotency-Key: your-key-here` — the same body returns the stored result.
 
 Sign in to the dashboard and open **Mailbox** to preview test sends. Use a `zs_live_` key for real delivery once your sending domain is onboarded to Cloudflare Email Sending.
 

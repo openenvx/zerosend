@@ -124,12 +124,16 @@ Before live sends work:
 curl -sS "$ZEROSEND_URL/v1/emails" \
   -H "Authorization: Bearer $ZEROSEND_LIVE_KEY" \
   -H "Content-Type: application/json" \
+  -H "Idempotency-Key: live-test-1" \
   -d '{
-    "to": "you@example.com",
+    "to": ["you@example.com", "teammate@example.com"],
+    "fromName": "Zerosend",
     "subject": "Live test",
     "text": "Hello from zerosend"
   }'
 ```
+
+`to` accepts one address or an array (max 50, deduped). Rate limit: 100 requests per API key per 60 seconds (`429` when exceeded). `Idempotency-Key` replays the stored response for the same body.
 
 Local dev simulates `env.EMAIL.send()` unless you add `"remote": true` to the `send_email` binding (then real emails are sent).
 
@@ -178,6 +182,8 @@ Set `ZEROSEND_URL=https://zerosend.yourdomain.com` in product apps that send mai
 ## Troubleshooting
 
 **`env.DB` / D1 errors locally** - run `bun run db:migrate:local` from the repo root.
+
+**`RATE_LIMIT_KV` / rate limit errors** - ensure `apps/zerosend/wrangler.jsonc` includes the `RATE_LIMIT_KV` KV binding. One-click deploy auto-provisions it; manual upgraders must pull the latest wrangler config and redeploy. Copy the namespace ID from **Workers & Pages → zerosend → Settings → Bindings → RATE_LIMIT_KV** into `wrangler.jsonc` locally if remote commands fail (do not commit account-specific IDs).
 
 **401 on `/v1/me`** - use a `zs_test_…` or `zs_live_…` API key from Settings, not the admin token.
 

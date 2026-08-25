@@ -18,4 +18,10 @@
     },
   ],
   "send_email": [{ "name": "EMAIL" }],
+  // Omit id for one-click deploy; Cloudflare provisions KV per account.
+  "kv_namespaces": [
+    {
+      "binding": "RATE_LIMIT_KV",
+    },
+  ],
 }

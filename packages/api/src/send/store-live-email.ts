@@ -2,6 +2,7 @@ import type { createDb } from '@zerosend/db';
 import { emailLogs } from '@zerosend/db/schema';
 
 import type { SendEmailInput } from './send-email-input';
+import { formatToAddressForLog } from './send-email-input';
 import type { SendEmailKeyContext } from './store-test-email';
 
 type Db = ReturnType<typeof createDb>;
@@ -35,7 +36,7 @@ export async function storeLiveEmailLog(
     status: params.status,
     subject: params.input.subject,
     textBody: null,
-    toAddress: params.input.to,
+    toAddress: formatToAddressForLog(params.input.to),
   });
 
   return { id };

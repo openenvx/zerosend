@@ -1,9 +1,15 @@
+export interface SendEmailAddress {
+  email: string;
+  name?: string;
+}
+
 export interface SendEmailMessage {
-  to: string;
-  from: string;
+  to: string | string[];
+  from: string | SendEmailAddress;
   subject: string;
   html?: string;
   text?: string;
+  replyTo?: string;
 }
 
 export interface SendEmailResult {

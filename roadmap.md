@@ -173,10 +173,10 @@ EmailFlare’s test keys / in-house mailbox: [emailflare.dev](https://www.emailf
 
 **You can:** treat `/v1/emails` like EmailFlare’s send endpoint - retries are safe, bursts are capped, one call can fan out.
 
-- [ ] `to`: one address or array (max 50), deduped
-- [ ] `fromName`, `replyTo`
-- [ ] `Idempotency-Key` header - repeat returns the stored result
-- [ ] Per-key rate limit + `X-RateLimit-Limit` / `Remaining` / `Reset`
+- [x] `to`: one address or array (max 50), deduped
+- [x] `fromName`, `replyTo`
+- [x] `Idempotency-Key` header - repeat returns the stored result
+- [x] Per-key rate limit + `X-RateLimit-Limit` / `Remaining` / `Reset`
 
 **Does not include:** templates, domains, automations.
 

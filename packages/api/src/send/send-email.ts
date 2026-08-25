@@ -10,7 +10,12 @@ import type { SendEmailKeyContext } from './store-test-email';
 type Db = ReturnType<typeof createDb>;
 
 export { MissingFromAddressError, SendEmailDeliveryError } from './errors';
-export { sendEmailInputSchema, type SendEmailInput } from './send-email-input';
+export {
+  formatToAddressForLog,
+  normalizeRecipients,
+  sendEmailInputSchema,
+  type SendEmailInput,
+} from './send-email-input';
 export type { SendEmailBinding } from './email-binding';
 export type { SendEmailKeyContext } from './store-test-email';
 

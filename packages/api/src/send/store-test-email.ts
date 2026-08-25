@@ -3,6 +3,7 @@ import { emailLogs } from '@zerosend/db/schema';
 
 import type { ApiKeyType } from '../auth/types';
 import type { SendEmailInput } from './send-email-input';
+import { formatToAddressForLog } from './send-email-input';
 
 export interface SendEmailKeyContext {
   keyId: string;
@@ -32,7 +33,7 @@ export async function storeTestEmail(
     status: 'sent',
     subject: input.subject,
     textBody: input.text ?? null,
-    toAddress: input.to,
+    toAddress: formatToAddressForLog(input.to),
   });
 
   return { id };

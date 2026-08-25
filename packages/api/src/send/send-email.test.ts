@@ -1,9 +1,10 @@
 import { describe, expect, it, vi } from 'vitest';
 
+import { buildSendEmailMessage } from './build-send-message';
 import type { SendEmailBinding } from './email-binding';
 import { MissingFromAddressError, SendEmailDeliveryError } from './errors';
 import { sendEmail } from './send-email';
-import { sendEmailInputSchema } from './send-email-input';
+import { normalizeRecipients, sendEmailInputSchema } from './send-email-input';
 import { storeTestEmail } from './store-test-email';
 
 function createMockDb(options: {
@@ -45,6 +46,9 @@ describe('sendEmailInputSchema', () => {
     });
 
     expect(result.success).toBe(true);
+    if (result.success) {
+      expect(result.data.to).toEqual(['user@example.com']);
+    }
   });
 
   it('accepts payloads without from for live default-from resolution', () => {
@@ -57,6 +61,56 @@ describe('sendEmailInputSchema', () => {
     expect(result.success).toBe(true);
   });
 
+  it('accepts to as an array', () => {
+    const result = sendEmailInputSchema.safeParse({
+      from: 'hello@example.com',
+      html: '<p>Hi</p>',
+      subject: 'Hello',
+      to: ['user1@example.com', 'user2@example.com'],
+    });
+
+    expect(result.success).toBe(true);
+  });
+
+  it('accepts fromName and replyTo', () => {
+    const result = sendEmailInputSchema.safeParse({
+      from: 'hello@example.com',
+      fromName: 'Hello Team',
+      html: '<p>Hi</p>',
+      replyTo: 'support@example.com',
+      subject: 'Hello',
+      to: 'user@example.com',
+    });
+
+    expect(result.success).toBe(true);
+  });
+
+  it('rejects more than 50 recipients', () => {
+    const to = Array.from(
+      { length: 51 },
+      (_, index) => `user${index}@example.com`
+    );
+    const result = sendEmailInputSchema.safeParse({
+      from: 'hello@example.com',
+      html: '<p>Hi</p>',
+      subject: 'Hello',
+      to,
+    });
+
+    expect(result.success).toBe(false);
+  });
+
+  it('rejects empty recipient arrays', () => {
+    const result = sendEmailInputSchema.safeParse({
+      from: 'hello@example.com',
+      html: '<p>Hi</p>',
+      subject: 'Hello',
+      to: [],
+    });
+
+    expect(result.success).toBe(false);
+  });
+
   it('rejects payloads without html or text', () => {
     const result = sendEmailInputSchema.safeParse({
       from: 'hello@example.com',
@@ -65,6 +119,48 @@ describe('sendEmailInputSchema', () => {
     });
 
     expect(result.success).toBe(false);
+  });
+});
+
+describe('normalizeRecipients', () => {
+  it('dedupes addresses case-insensitively while preserving first casing', () => {
+    expect(
+      normalizeRecipients([
+        'User@Example.com',
+        'user@example.com',
+        'Other@Example.com',
+      ])
+    ).toEqual(['User@Example.com', 'Other@Example.com']);
+  });
+
+  it('wraps a single address in an array', () => {
+    expect(normalizeRecipients('user@example.com')).toEqual([
+      'user@example.com',
+    ]);
+  });
+});
+
+describe('buildSendEmailMessage', () => {
+  it('maps fromName and replyTo to the email binding payload', () => {
+    const message = buildSendEmailMessage(
+      {
+        from: 'hello@example.com',
+        fromName: 'Hello Team',
+        html: '<p>Hi</p>',
+        replyTo: 'support@example.com',
+        subject: 'Hello',
+        to: ['user1@example.com', 'user2@example.com'],
+      },
+      'hello@example.com'
+    );
+
+    expect(message).toEqual({
+      from: { email: 'hello@example.com', name: 'Hello Team' },
+      html: '<p>Hi</p>',
+      replyTo: 'support@example.com',
+      subject: 'Hello',
+      to: ['user1@example.com', 'user2@example.com'],
+    });
   });
 });
 
@@ -80,7 +176,7 @@ describe('sendEmail live path', () => {
         from: 'hello@example.com',
         html: '<p>Hi</p>',
         subject: 'Hello',
-        to: 'user@example.com',
+        to: ['user@example.com'],
       },
       {
         keyId: 'key-id',
@@ -95,8 +191,7 @@ describe('sendEmail live path', () => {
       from: 'hello@example.com',
       html: '<p>Hi</p>',
       subject: 'Hello',
-      text: undefined,
-      to: 'user@example.com',
+      to: ['user@example.com'],
     });
     expect(insertedValues[0]).toMatchObject({
       apiKeyPrefix: 'zs_live_abc',
@@ -112,6 +207,37 @@ describe('sendEmail live path', () => {
     });
   });
 
+  it('sends one message with multiple recipients', async () => {
+    const send = vi.fn().mockResolvedValue({ messageId: 'cf-msg-multi' });
+    const emailBinding: SendEmailBinding = { send };
+    const { mockDb, insertedValues } = createMockDb({});
+
+    await sendEmail(
+      mockDb,
+      {
+        from: 'hello@example.com',
+        html: '<p>Hi</p>',
+        subject: 'Hello',
+        to: ['user1@example.com', 'user2@example.com'],
+      },
+      {
+        keyId: 'key-id',
+        keyPrefix: 'zs_live_abc',
+        keyType: 'live',
+      },
+      { emailBinding }
+    );
+
+    expect(send).toHaveBeenCalledWith(
+      expect.objectContaining({
+        to: ['user1@example.com', 'user2@example.com'],
+      })
+    );
+    expect(insertedValues[0]).toMatchObject({
+      toAddress: 'user1@example.com, user2@example.com',
+    });
+  });
+
   it('uses defaultFrom when from is omitted', async () => {
     const send = vi.fn().mockResolvedValue({ messageId: 'cf-msg-456' });
     const emailBinding: SendEmailBinding = { send };
@@ -122,7 +248,7 @@ describe('sendEmail live path', () => {
       {
         subject: 'Hello',
         text: 'Hi',
-        to: 'user@example.com',
+        to: ['user@example.com'],
       },
       {
         keyId: 'key-id',
@@ -148,7 +274,7 @@ describe('sendEmail live path', () => {
         {
           subject: 'Hello',
           text: 'Hi',
-          to: 'user@example.com',
+          to: ['user@example.com'],
         },
         {
           keyId: 'key-id',
@@ -177,7 +303,7 @@ describe('sendEmail live path', () => {
           from: 'hello@example.com',
           subject: 'Hello',
           text: 'Hi',
-          to: 'user@example.com',
+          to: ['user@example.com'],
         },
         {
           keyId: 'key-id',
@@ -214,7 +340,7 @@ describe('sendEmail test path', () => {
         {
           subject: 'Hello',
           text: 'Hi',
-          to: 'user@example.com',
+          to: ['user@example.com'],
         },
         {
           keyId: 'key-id',
@@ -243,7 +369,7 @@ describe('sendEmail test path', () => {
         from: 'hello@example.com',
         subject: 'Hello',
         text: 'Hi',
-        to: 'user@example.com',
+        to: ['user@example.com'],
       },
       {
         keyId: 'key-id',
@@ -254,6 +380,37 @@ describe('sendEmail test path', () => {
     );
 
     expect(send).not.toHaveBeenCalled();
+  });
+
+  it('stores joined recipients for test keys', async () => {
+    const insertedValues: Record<string, unknown>[] = [];
+    const mockDb = {
+      insert: () => ({
+        values: (values: Record<string, unknown>) => {
+          insertedValues.push(values);
+          return Promise.resolve();
+        },
+      }),
+    } as unknown as Parameters<typeof storeTestEmail>[0];
+
+    await storeTestEmail(
+      mockDb,
+      {
+        from: 'hello@example.com',
+        html: '<p>Hi</p>',
+        subject: 'Hello',
+        to: ['user1@example.com', 'user2@example.com'],
+      },
+      {
+        keyId: 'key-123',
+        keyPrefix: 'zs_test_abc',
+        keyType: 'test',
+      }
+    );
+
+    expect(insertedValues[0]).toMatchObject({
+      toAddress: 'user1@example.com, user2@example.com',
+    });
   });
 });
 
@@ -289,7 +446,7 @@ describe('storeTestEmail', () => {
         from: 'hello@example.com',
         html: '<p>Hi</p>',
         subject: 'Hello',
-        to: 'user@example.com',
+        to: ['user@example.com'],
       },
       {
         keyId: 'key-123',

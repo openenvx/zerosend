@@ -22,6 +22,13 @@
       "when": 1787685921847,
       "tag": "0002_phase2_live_logs",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "6",
+      "when": 1787690000000,
+      "tag": "0003_phase3_production_send",
+      "breakpoints": true
     }
   ]
 }

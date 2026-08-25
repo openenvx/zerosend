@@ -1,5 +1,6 @@
 import type { createDb } from '@zerosend/db';
 
+import { buildSendEmailMessage } from './build-send-message';
 import type { SendEmailBinding } from './email-binding';
 import {
   formatCloudflareEmailError,
@@ -21,13 +22,9 @@ export async function sendLiveEmail(
   const fromAddress = await resolveFromAddress(db, input.from);
 
   try {
-    const response = await emailBinding.send({
-      from: fromAddress,
-      html: input.html,
-      subject: input.subject,
-      text: input.text,
-      to: input.to,
-    });
+    const response = await emailBinding.send(
+      buildSendEmailMessage(input, fromAddress)
+    );
 
     return storeLiveEmailLog(db, {
       cloudflareMessageId: response.messageId,
