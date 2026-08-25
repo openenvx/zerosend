@@ -1,6 +1,6 @@
 # zerosend
 
-Self-hosted email platform on Cloudflare Workers — dashboard, REST API, and D1. Deploy with **Wrangler** or the **Deploy to Cloudflare** button.
+Self-hosted email platform on Cloudflare Workers - dashboard, REST API, and D1. Deploy with **Wrangler** or the **Deploy to Cloudflare** button.
 
 [![Deploy to Cloudflare](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/openenvx/zerosend)
 
@@ -52,11 +52,11 @@ See [DEPLOY.md](./DEPLOY.md) for custom domains, landing deploy, and troubleshoo
 
 ## Features
 
-- **TypeScript** — type-safe app and API
-- **TanStack Start** — SSR on Cloudflare Workers
-- **oRPC** — typed dashboard API
-- **Drizzle + D1** — SQLite at the edge
-- **Wrangler** — standard Cloudflare deploy path for external users
+- **TypeScript** - type-safe app and API
+- **TanStack Start** - SSR on Cloudflare Workers
+- **oRPC** - typed dashboard API
+- **Drizzle + D1** - SQLite at the edge
+- **Wrangler** - standard Cloudflare deploy path for external users
 
 ## Project structure
 
@@ -75,21 +75,57 @@ zerosend/
 
 ## Environment (zerosend Worker)
 
-| Variable         | Where                        | Purpose                  |
-| ---------------- | ---------------------------- | ------------------------ |
-| `ADMIN_TOKEN`    | `.dev.vars` / deploy secrets | Operator dashboard login |
-| `SESSION_SECRET` | `.dev.vars` / deploy secrets | JWT cookie signing       |
-| `DB`             | wrangler D1 binding          | API keys + settings      |
+| Variable | Where | Purpose |
+| --- | --- | --- |
+| `ADMIN_TOKEN` | `.dev.vars` / deploy secrets | Operator dashboard login |
+| `SESSION_SECRET` | `.dev.vars` / deploy secrets | JWT cookie signing |
+| `DB` | wrangler D1 binding | API keys, settings, email logs |
+| `EMAIL` | wrangler `send_email` binding | Cloudflare Email Sending for `zs_live_` keys |
 
 ## Product integration
 
 ```bash
 export ZEROSEND_URL=https://your-worker.workers.dev
-export ZEROSEND_API_KEY=zs_live_…
+export ZEROSEND_API_KEY=zs_test_…
 
+# Verify the key
 curl -sS "$ZEROSEND_URL/v1/me" \
   -H "Authorization: Bearer $ZEROSEND_API_KEY"
+
+# Send a test email (stored in /mailbox - no outbound delivery)
+curl -sS "$ZEROSEND_URL/v1/emails" \
+  -H "Authorization: Bearer $ZEROSEND_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "from": "hello@example.com",
+    "to": "user@example.com",
+    "subject": "Hello from Zerosend",
+    "html": "<p>It works.</p>"
+  }'
 ```
+
+Sign in to the dashboard and open **Mailbox** to preview test sends. Use a `zs_live_` key for real delivery once your sending domain is onboarded to Cloudflare Email Sending.
+
+### Live send (`zs_live_`)
+
+1. Onboard a sending domain: `wrangler email sending enable yourdomain.com` (or Dashboard → Email Service → Onboard Domain).
+2. Set **Settings → Default from address** to an address on that domain (used when `from` is omitted).
+3. Create a **live** API key and send:
+
+```bash
+export ZEROSEND_API_KEY=zs_live_…
+
+curl -sS "$ZEROSEND_URL/v1/emails" \
+  -H "Authorization: Bearer $ZEROSEND_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "to": "you@example.com",
+    "subject": "Hello from Zerosend",
+    "html": "<p>Live delivery.</p>"
+  }'
+```
+
+Local `wrangler dev` simulates the `EMAIL` binding by default. Add `"remote": true` to the `send_email` binding in `apps/zerosend/wrangler.jsonc` when you want real sends from your laptop.
 
 ## Scripts
 

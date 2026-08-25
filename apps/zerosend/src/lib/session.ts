@@ -1,8 +1,8 @@
-import { createServerFn } from "@tanstack/react-start";
-import { getRequest } from "@tanstack/react-start/server";
-import { getSessionCookie, verifyAdminSessionToken } from "@zerosend/api/auth";
+import { createServerFn } from '@tanstack/react-start';
+import { getRequest } from '@tanstack/react-start/server';
+import { getSessionCookie, verifyAdminSessionToken } from '@zerosend/api/auth';
 
-export const getSession = createServerFn({ method: "GET" }).handler(
+export const getSession = createServerFn({ method: 'GET' }).handler(
   async () => {
     const request = getRequest();
     const token = getSessionCookie(request);

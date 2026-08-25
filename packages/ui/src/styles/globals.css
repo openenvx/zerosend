@@ -1,6 +1,6 @@
-@import "tailwindcss";
-@import "tw-animate-css";
-@import "shadcn/tailwind.css";
+@import 'tailwindcss';
+@import 'tw-animate-css';
+@import 'shadcn/tailwind.css';
 @source "../../../apps/**/*.{ts,tsx}";
 @source "../**/*.{ts,tsx}";
 
@@ -76,7 +76,7 @@
 }
 
 @theme inline {
-  --font-sans: "Inter Variable", sans-serif;
+  --font-sans: 'Inter Variable', sans-serif;
 
   --color-void: var(--color-void);
   --color-graphite: var(--color-graphite);
@@ -179,37 +179,37 @@
   }
 
   body {
-    @apply bg-background font-sans text-foreground antialiased;
+    @apply bg-background text-foreground font-sans antialiased;
   }
 
   html {
     @apply font-sans;
   }
 
-  [data-sidebar="menu-button"],
-  [data-slot="button"],
-  [data-slot="input"],
-  [data-slot="textarea"] {
+  [data-sidebar='menu-button'],
+  [data-slot='button'],
+  [data-slot='input'],
+  [data-slot='textarea'] {
     border: 1px solid transparent;
     box-shadow: none;
   }
 
-  [data-slot="input"],
-  [data-slot="textarea"] {
+  [data-slot='input'],
+  [data-slot='textarea'] {
     border-color: var(--border);
   }
 
-  [data-sidebar="menu-button"] {
+  [data-sidebar='menu-button'] {
     border-radius: var(--radius-nav);
     font-size: var(--text-nav);
     letter-spacing: -0.01em;
     line-height: 1.2;
   }
 
-  [data-sidebar="menu-button"]:focus-visible,
-  [data-slot="button"]:focus-visible,
-  [data-slot="input"]:focus-visible,
-  [data-slot="textarea"]:focus-visible {
+  [data-sidebar='menu-button']:focus-visible,
+  [data-slot='button']:focus-visible,
+  [data-slot='input']:focus-visible,
+  [data-slot='textarea']:focus-visible {
     outline: none;
     border-color: var(--focus-border-color);
     box-shadow: none;

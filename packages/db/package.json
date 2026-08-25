@@ -17,12 +17,9 @@
     "db:migrate:deploy": "drizzle-kit migrate"
   },
   "dependencies": {
-    "@libsql/client": "catalog:",
     "@zerosend/env": "workspace:*",
     "dotenv": "catalog:",
-    "drizzle-orm": "^0.45.2",
-    "libsql": "catalog:",
-    "zod": "catalog:"
+    "drizzle-orm": "^0.45.2"
   },
   "devDependencies": {
     "@zerosend/config": "workspace:*",

@@ -1,11 +1,11 @@
-import { OpenAPIHandler } from "@orpc/openapi/fetch";
-import { OpenAPIReferencePlugin } from "@orpc/openapi/plugins";
-import { onError } from "@orpc/server";
-import { RPCHandler } from "@orpc/server/fetch";
-import { ZodToJsonSchemaConverter } from "@orpc/zod/zod4";
-import { createFileRoute } from "@tanstack/react-router";
-import { createContext } from "@zerosend/api/context";
-import { appRouter } from "@zerosend/api/routers/index";
+import { OpenAPIHandler } from '@orpc/openapi/fetch';
+import { OpenAPIReferencePlugin } from '@orpc/openapi/plugins';
+import { onError } from '@orpc/server';
+import { RPCHandler } from '@orpc/server/fetch';
+import { ZodToJsonSchemaConverter } from '@orpc/zod/zod4';
+import { createFileRoute } from '@tanstack/react-router';
+import { createContext } from '@zerosend/api/context';
+import { appRouter } from '@zerosend/api/routers/index';
 
 const rpcHandler = new RPCHandler(appRouter, {
   interceptors: [
@@ -16,43 +16,47 @@ const rpcHandler = new RPCHandler(appRouter, {
 });
 
 const apiHandler = new OpenAPIHandler(appRouter, {
-  plugins: [
-    new OpenAPIReferencePlugin({
-      schemaConverters: [new ZodToJsonSchemaConverter()],
-    }),
-  ],
   interceptors: [
     onError((error) => {
       console.error(error);
+    }),
+  ],
+  plugins: [
+    new OpenAPIReferencePlugin({
+      schemaConverters: [new ZodToJsonSchemaConverter()],
     }),
   ],
 });
 
 async function handle({ request }: { request: Request }) {
   const rpcResult = await rpcHandler.handle(request, {
-    prefix: "/api/rpc",
     context: await createContext({ req: request }),
+    prefix: '/api/rpc',
   });
-  if (rpcResult.response) return rpcResult.response;
+  if (rpcResult.response) {
+    return rpcResult.response;
+  }
 
   const apiResult = await apiHandler.handle(request, {
-    prefix: "/api/rpc/api-reference",
     context: await createContext({ req: request }),
+    prefix: '/api/rpc/api-reference',
   });
-  if (apiResult.response) return apiResult.response;
+  if (apiResult.response) {
+    return apiResult.response;
+  }
 
-  return new Response("Not found", { status: 404 });
+  return new Response('Not found', { status: 404 });
 }
 
-export const Route = createFileRoute("/api/rpc/$")({
+export const Route = createFileRoute('/api/rpc/$')({
   server: {
     handlers: {
-      HEAD: handle,
+      DELETE: handle,
       GET: handle,
+      HEAD: handle,
+      PATCH: handle,
       POST: handle,
       PUT: handle,
-      PATCH: handle,
-      DELETE: handle,
     },
   },
 });

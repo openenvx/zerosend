@@ -1,25 +1,31 @@
-import { useQuery } from "@tanstack/react-query";
-import { Link, createFileRoute } from "@tanstack/react-router";
-import { EmptyState } from "@zerosend/ui/components/empty-state";
-import { Check, ChevronRight, KeyRound, Mail, ScrollText } from "lucide-react";
+import { useQuery } from '@tanstack/react-query';
+import { Link, createFileRoute } from '@tanstack/react-router';
+import { EmptyState } from '@zerosend/ui/components/empty-state';
+import { Check, ChevronRight, KeyRound, Mail, ScrollText } from 'lucide-react';
 
-import { orpc } from "@/utils/orpc";
+import { EmailLogRow } from '@/components/email-log-row';
+import { orpc } from '@/utils/orpc';
 
-export const Route = createFileRoute("/_authed/")({
+const LOGS_LIST_LIMIT = 50;
+
+export const Route = createFileRoute('/_authed/')({
   component: HomePage,
 });
 
 function HomePage() {
   const keysQuery = useQuery(orpc.keys.list.queryOptions());
+  const logsQuery = useQuery(orpc.logs.list.queryOptions());
 
   const activeKeyCount =
     keysQuery.data?.filter((key) => key.active).length ?? 0;
   const hasKey = activeKeyCount > 0;
+  const hasSentEmail = logsQuery.data?.some((log) => log.isTest) ?? false;
+  const logs = logsQuery.data ?? [];
 
   const today = new Intl.DateTimeFormat(undefined, {
-    weekday: "long",
-    month: "long",
-    day: "numeric",
+    day: 'numeric',
+    month: 'long',
+    weekday: 'long',
   }).format(new Date());
 
   return (
@@ -30,8 +36,8 @@ function HomePage() {
       </header>
 
       <div className="grid gap-3 lg:grid-cols-[minmax(0,1.55fr)_minmax(240px,1fr)]">
-        <section className="rounded-[var(--radius-panel)] bg-card p-4 ring-1 ring-border">
-          <h2 className="mb-4 text-card-title text-foreground">Get started</h2>
+        <section className="bg-card ring-border rounded-[var(--radius-panel)] p-4 ring-1">
+          <h2 className="text-card-title text-foreground mb-4">Get started</h2>
           <div className="space-y-1">
             <SetupRow
               action={null}
@@ -54,33 +60,45 @@ function HomePage() {
               completed={hasKey}
               description={
                 hasKey
-                  ? `${activeKeyCount} active key${activeKeyCount === 1 ? "" : "s"} ready for product apps.`
-                  : "Mint a send key for your other projects."
+                  ? `${activeKeyCount} active key${activeKeyCount === 1 ? '' : 's'} ready for product apps.`
+                  : 'Mint a send key for your other projects.'
               }
               icon={KeyRound}
               label="Create an API key"
             />
             <SetupRow
-              action={null}
-              completed={false}
-              description="Coming in Phase 2 — send from another app and see logs here."
-              disabled
+              action={
+                hasSentEmail ? null : (
+                  <Link
+                    className="text-body text-foreground hover:underline"
+                    to="/mailbox"
+                  >
+                    Send test
+                  </Link>
+                )
+              }
+              completed={hasSentEmail}
+              description={
+                hasSentEmail
+                  ? 'Your first test message is stored in the mailbox.'
+                  : 'Send a test email from the mailbox or POST /v1/emails.'
+              }
               icon={Mail}
               label="Send your first email"
             />
           </div>
         </section>
 
-        <aside className="rounded-[var(--radius-panel)] bg-card p-4 ring-1 ring-border">
+        <aside className="bg-card ring-border rounded-[var(--radius-panel)] p-4 ring-1">
           <h2 className="text-card-title text-foreground">API keys</h2>
-          <p className="mt-1 text-body text-muted-foreground">
+          <p className="text-body text-muted-foreground mt-1">
             Active keys for product integrations
           </p>
-          <p className="mt-4 text-[24px] font-medium text-foreground">
-            {keysQuery.isPending ? "…" : activeKeyCount}
+          <p className="text-foreground mt-4 text-[24px] font-medium">
+            {keysQuery.isPending ? '…' : activeKeyCount}
           </p>
           <Link
-            className="mt-4 inline-flex h-8 w-full items-center justify-center rounded-md border border-border bg-background px-3 text-sm font-medium hover:bg-muted"
+            className="border-border bg-background hover:bg-muted mt-4 inline-flex h-8 w-full items-center justify-center rounded-md border px-3 text-sm font-medium"
             to="/settings"
           >
             Manage keys
@@ -88,18 +106,37 @@ function HomePage() {
         </aside>
       </div>
 
-      <section className="rounded-[var(--radius-panel)] bg-card ring-1 ring-border">
-        <div className="border-b border-border px-4 py-3">
-          <div className="flex items-center gap-2">
-            <ScrollText className="size-4 text-muted-foreground" />
-            <h2 className="text-card-title text-foreground">Logs</h2>
+      <section className="bg-card ring-border rounded-[var(--radius-panel)] ring-1">
+        <div className="border-border border-b px-4 py-3">
+          <div className="flex items-center justify-between gap-2">
+            <div className="flex items-center gap-2">
+              <ScrollText className="text-muted-foreground size-4" />
+              <h2 className="text-card-title text-foreground">Logs</h2>
+            </div>
+            {logs.length >= LOGS_LIST_LIMIT ? (
+              <p className="text-kbd text-muted-foreground">
+                Showing latest {LOGS_LIST_LIMIT}
+              </p>
+            ) : null}
           </div>
         </div>
-        <EmptyState
-          description="Transactional sends will appear here in Phase 2."
-          icon={ScrollText}
-          title="No messages yet"
-        />
+        {logsQuery.isPending ? (
+          <div className="text-body text-muted-foreground p-6">
+            Loading logs…
+          </div>
+        ) : logs.length === 0 ? (
+          <EmptyState
+            description="Send a test from the mailbox with a zs_test_ key, or POST /v1/emails with a zs_live_ key for real delivery."
+            icon={ScrollText}
+            title="No messages yet"
+          />
+        ) : (
+          <div className="divide-border divide-y">
+            {logs.map((log) => (
+              <EmailLogRow key={log.id} log={log} />
+            ))}
+          </div>
+        )}
       </section>
     </div>
   );
@@ -125,25 +162,25 @@ function SetupRow({
   return (
     <div
       className={`flex items-center gap-3 rounded-[var(--radius-control)] px-2 py-3 ${
-        disabled ? "opacity-60" : ""
+        disabled ? 'opacity-60' : ''
       }`}
     >
       <div
         className={`flex size-4 shrink-0 items-center justify-center rounded-full ${
           completed
-            ? "bg-[var(--status-completed)] text-[var(--color-void)]"
-            : "bg-[var(--status-pending)]"
+            ? 'bg-[var(--status-completed)] text-[var(--color-void)]'
+            : 'bg-[var(--status-pending)]'
         }`}
       >
         {completed ? <Check className="size-2.5" strokeWidth={3} /> : null}
       </div>
-      <Icon className="size-4 shrink-0 text-muted-foreground" />
+      <Icon className="text-muted-foreground size-4 shrink-0" />
       <div className="min-w-0 flex-1">
         <p className="text-body text-foreground">{label}</p>
         <p className="text-kbd text-muted-foreground">{description}</p>
       </div>
       {action ? (
-        <div className="flex shrink-0 items-center gap-1 text-muted-foreground">
+        <div className="text-muted-foreground flex shrink-0 items-center gap-1">
           {action}
           <ChevronRight className="size-4" />
         </div>

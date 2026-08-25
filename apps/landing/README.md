@@ -2,8 +2,8 @@
 
 Marketing site and documentation for Zerosend.
 
-- `/` — product landing page
-- `/docs` — Fumadocs-powered docs (MDX in `content/docs`)
+- `/` - product landing page
+- `/docs` - Fumadocs-powered docs (MDX in `content/docs`)
 
 Dev from repo root:
 

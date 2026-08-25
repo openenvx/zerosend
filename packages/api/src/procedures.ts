@@ -1,7 +1,7 @@
-import { ORPCError } from "@orpc/server";
+import { ORPCError } from '@orpc/server';
 
-import { requireAdmin } from "./context";
-import { o } from "./index";
+import { requireAdmin } from './context';
+import { o } from './index';
 
 export const publicProcedure = o;
 
@@ -10,6 +10,6 @@ export const adminProcedure = o.use(({ context, next }) => {
     const principal = requireAdmin(context.principal);
     return next({ context: { ...context, principal } });
   } catch {
-    throw new ORPCError("UNAUTHORIZED");
+    throw new ORPCError('UNAUTHORIZED');
   }
 });

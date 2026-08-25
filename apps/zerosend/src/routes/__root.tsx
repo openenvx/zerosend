@@ -1,19 +1,19 @@
-import type { QueryClient } from "@tanstack/react-query";
-import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
+import type { QueryClient } from '@tanstack/react-query';
+import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import {
   HeadContent,
   Outlet,
   Scripts,
   createRootRouteWithContext,
-} from "@tanstack/react-router";
-import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
-import { createMiddleware } from "@tanstack/react-start";
-import { Toaster } from "@zerosend/ui/components/sonner";
-import { evlogErrorHandler } from "evlog/nitro/v3";
+} from '@tanstack/react-router';
+import { TanStackRouterDevtools } from '@tanstack/react-router-devtools';
+import { createMiddleware } from '@tanstack/react-start';
+import { Toaster } from '@zerosend/ui/components/sonner';
+import { evlogErrorHandler } from 'evlog/nitro/v3';
 
-import type { orpc } from "@/utils/orpc";
+import type { orpc } from '@/utils/orpc';
 
-import appCss from "../index.css?url";
+import appCss from '../index.css?url';
 
 export interface RouterAppContext {
   orpc: typeof orpc;
@@ -21,32 +21,32 @@ export interface RouterAppContext {
 }
 
 export const Route = createRootRouteWithContext<RouterAppContext>()({
-  server: {
-    middleware: [createMiddleware().server(evlogErrorHandler)],
-  },
+  component: RootDocument,
 
   head: () => ({
-    meta: [
-      {
-        charSet: "utf-8",
-      },
-      {
-        name: "viewport",
-        content: "width=device-width, initial-scale=1",
-      },
-      {
-        title: "Zerosend",
-      },
-    ],
     links: [
       {
-        rel: "stylesheet",
         href: appCss,
+        rel: 'stylesheet',
+      },
+    ],
+    meta: [
+      {
+        charSet: 'utf-8',
+      },
+      {
+        content: 'width=device-width, initial-scale=1',
+        name: 'viewport',
+      },
+      {
+        title: 'Zerosend',
       },
     ],
   }),
 
-  component: RootDocument,
+  server: {
+    middleware: [createMiddleware().server(evlogErrorHandler)],
+  },
 });
 
 function RootDocument() {

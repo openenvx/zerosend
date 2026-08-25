@@ -1,5 +1,5 @@
-import evlog from "evlog/nitro/v3";
-import { defineConfig } from "nitro";
+import evlog from 'evlog/nitro/v3';
+import { defineConfig } from 'nitro';
 
 export default defineConfig({
   experimental: {
@@ -7,7 +7,7 @@ export default defineConfig({
   },
   modules: [
     evlog({
-      env: { service: "zerosend" },
+      env: { service: 'zerosend' },
     }),
   ],
 });

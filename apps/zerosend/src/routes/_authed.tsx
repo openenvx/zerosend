@@ -1,23 +1,23 @@
-import { Outlet, createFileRoute, redirect } from "@tanstack/react-router";
+import { Outlet, createFileRoute, redirect } from '@tanstack/react-router';
 
-import { DashboardShell } from "@/components/dashboard-shell";
-import Loader from "@/components/loader";
-import { getSession } from "@/lib/session";
+import { DashboardShell } from '@/components/dashboard-shell';
+import Loader from '@/components/loader';
+import { getSession } from '@/lib/session';
 
-export const Route = createFileRoute("/_authed")({
+export const Route = createFileRoute('/_authed')({
+  component: AuthedLayout,
   loader: async () => {
     const session = await getSession();
     if (!session.authenticated) {
-      throw redirect({ to: "/login" });
+      throw redirect({ to: '/login' });
     }
 
     return session;
   },
-  staleTime: 60_000,
-  pendingMs: 0,
-  pendingMinMs: 0,
-  component: AuthedLayout,
   pendingComponent: AuthedPending,
+  pendingMinMs: 0,
+  pendingMs: 0,
+  staleTime: 60_000,
 });
 
 function AuthedLayout() {

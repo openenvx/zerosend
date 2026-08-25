@@ -1,12 +1,200 @@
-@import "tailwindcss";
-@import "fumadocs-ui/css/neutral.css";
-@import "fumadocs-ui/css/preset.css";
+@import '@fontsource-variable/dm-sans';
+@import '@fontsource/jetbrains-mono/400.css';
+@import '@fontsource/jetbrains-mono/500.css';
+@import 'tailwindcss';
+@import 'fumadocs-ui/css/neutral.css';
+@import 'fumadocs-ui/css/preset.css';
+
+@theme {
+  --color-paper-white: #ffffff;
+  --color-ink-black: #000000;
+  --color-carbon: #181818;
+  --color-electric-blue: #0099ff;
+  --color-ash: #6d6d6d;
+  --color-smoke: #9a9a9a;
+  --color-graphite: #636363;
+
+  --color-background: #000000;
+  --color-foreground: #ffffff;
+  --color-card: #181818;
+  --color-card-foreground: #ffffff;
+  --color-muted: #141414;
+  --color-muted-foreground: #9a9a9a;
+  --color-border: rgba(255, 255, 255, 0.1);
+  --color-ring: rgba(0, 153, 255, 0.45);
+  --color-accent: #0099ff;
+
+  --color-plate-warm: #d8c3b4;
+  --color-plate-cool: #b9c4cf;
+
+  --color-marketing-surface-base: #000000;
+  --color-marketing-surface-base-subtle: #0c0c0c;
+  --color-marketing-surface-raised: #181818;
+  --color-marketing-surface-faded: rgba(255, 255, 255, 0.04);
+  --color-marketing-surface-faded-bolder: rgba(255, 255, 255, 0.08);
+  --color-marketing-surface-base-inverse: #ffffff;
+  --color-marketing-surface-base-inverse-subtle: rgba(255, 255, 255, 0.9);
+
+  --color-marketing-inverse: #000000;
+  --color-marketing-subtle: rgba(255, 255, 255, 0.66);
+  --color-marketing-subtler: rgba(255, 255, 255, 0.45);
+  --color-marketing-subtlest: rgba(255, 255, 255, 0.28);
+
+  --color-marketing-divider: rgba(255, 255, 255, 0.08);
+  --color-marketing-divider-bold: rgba(255, 255, 255, 0.14);
+
+  --font-roobert:
+    'DM Sans Variable', 'DM Sans', ui-sans-serif, system-ui, -apple-system,
+    BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-mono:
+    'JetBrains Mono', ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas,
+    monospace;
+
+  --spacing-outer-gutter: clamp(1rem, 4vw, 2.5rem);
+  --spacing-section-sm: clamp(2.5rem, 5vw, 4rem);
+  --spacing-section: clamp(4.5rem, 8vw, 7rem);
+  --spacing-section-lg: clamp(6rem, 11vw, 9.5rem);
+
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --shadow-browser:
+    0 40px 120px rgba(0, 0, 0, 0.55), 0 2px 8px rgba(0, 0, 0, 0.4);
+
+  --animate-mask-flare-loop: mask-flare 5s var(--ease-out-expo) infinite;
+}
+
+:root {
+  --marketing-header-height: 64px;
+}
 
 html {
+  scroll-behavior: smooth;
   scrollbar-gutter: stable;
 }
 
 html > body[data-scroll-locked] {
-  margin-right: 0px !important;
+  margin-right: 0 !important;
   --removed-body-scroll-bar-size: 0px !important;
+}
+
+body {
+  font-family: var(--font-roobert);
+  font-size: 1.125rem;
+  -webkit-font-smoothing: antialiased;
+  line-height: 1.36;
+  color: var(--color-foreground);
+  background-color: var(--color-background);
+  text-rendering: optimizeLegibility;
+}
+
+@utility f-display-xl {
+  font-size: clamp(2.25rem, 5vw, 3.75rem);
+  font-weight: 300;
+  letter-spacing: -0.022em;
+  line-height: 1.05;
+}
+
+@utility f-display-lg {
+  font-size: clamp(1.875rem, 3.6vw, 2.75rem);
+  font-weight: 300;
+  letter-spacing: -0.018em;
+  line-height: 1.1;
+}
+
+@utility f-display-md {
+  font-size: clamp(1.375rem, 2.2vw, 1.75rem);
+  font-weight: 300;
+  letter-spacing: -0.012em;
+  line-height: 1.2;
+}
+
+@utility f-heading-sm {
+  font-size: 1.0625rem;
+  font-weight: 500;
+  letter-spacing: -0.006em;
+  line-height: 1.35;
+}
+
+@utility f-body-lg {
+  font-size: clamp(1.0625rem, 1.3vw, 1.1875rem);
+  font-weight: 400;
+  letter-spacing: -0.004em;
+  line-height: 1.5;
+}
+
+@utility f-body-md {
+  font-size: 1rem;
+  font-weight: 400;
+  line-height: 1.55;
+}
+
+@utility f-body-sm {
+  font-size: 0.875rem;
+  font-weight: 400;
+  line-height: 1.5;
+}
+
+@utility f-label {
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+@utility f-micro {
+  font-family: var(--font-mono);
+  font-size: 0.5625rem;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+@utility mask-flare-loop {
+  animation: var(--animate-mask-flare-loop);
+  -webkit-mask-image: linear-gradient(
+    90deg,
+    #000 0%,
+    #000 40%,
+    rgba(0, 0, 0, 0.45) 50%,
+    #000 60%,
+    #000 100%
+  );
+  mask-image: linear-gradient(
+    90deg,
+    #000 0%,
+    #000 40%,
+    rgba(0, 0, 0, 0.45) 50%,
+    #000 60%,
+    #000 100%
+  );
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-size: 250% 100%;
+  mask-size: 250% 100%;
+  -webkit-mask-position: 100% 0;
+  mask-position: 100% 0;
+}
+
+@keyframes mask-flare {
+  0% {
+    -webkit-mask-position: 100% 0;
+    mask-position: 100% 0;
+  }
+  60%,
+  100% {
+    -webkit-mask-position: 0% 0;
+    mask-position: 0% 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  .mask-flare-loop {
+    animation: none;
+  }
 }

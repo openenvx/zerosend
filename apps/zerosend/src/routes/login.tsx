@@ -1,25 +1,24 @@
-import { createFileRoute, redirect } from "@tanstack/react-router";
-import { useRouter } from "@tanstack/react-router";
-import { Button } from "@zerosend/ui/components/button";
-import { Input } from "@zerosend/ui/components/input";
-import { Label } from "@zerosend/ui/components/label";
-import { useState } from "react";
+import { createFileRoute, redirect, useRouter } from '@tanstack/react-router';
+import { Button } from '@zerosend/ui/components/button';
+import { Input } from '@zerosend/ui/components/input';
+import { Label } from '@zerosend/ui/components/label';
+import { useState } from 'react';
 
-import { getSession } from "@/lib/session";
+import { getSession } from '@/lib/session';
 
-export const Route = createFileRoute("/login")({
+export const Route = createFileRoute('/login')({
+  component: LoginPage,
   loader: async () => {
     const session = await getSession();
     if (session.authenticated) {
-      throw redirect({ to: "/" });
+      throw redirect({ to: '/' });
     }
   },
-  component: LoginPage,
 });
 
 function LoginPage() {
   return (
-    <div className="flex min-h-svh items-center justify-center bg-background px-6 py-12">
+    <div className="bg-background flex min-h-svh items-center justify-center px-6 py-12">
       <LoginForm />
     </div>
   );
@@ -27,7 +26,7 @@ function LoginPage() {
 
 function LoginForm() {
   const router = useRouter();
-  const [token, setToken] = useState("");
+  const [token, setToken] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
 
@@ -37,31 +36,31 @@ function LoginForm() {
     setError(null);
 
     try {
-      const response = await fetch("/api/auth/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
+      const response = await fetch('/api/auth/login', {
         body: JSON.stringify({ token }),
+        headers: { 'Content-Type': 'application/json' },
+        method: 'POST',
       });
       const body = (await response.json()) as { ok: boolean; error?: string };
 
       if (!response.ok || !body.ok) {
-        setError(body.error ?? "Invalid admin token");
+        setError(body.error ?? 'Invalid admin token');
         return;
       }
 
       await router.invalidate();
-      await router.navigate({ to: "/" });
+      await router.navigate({ to: '/' });
     } catch {
-      setError("Invalid admin token");
+      setError('Invalid admin token');
     } finally {
       setPending(false);
     }
   }
 
   return (
-    <div className="w-full max-w-sm rounded-[var(--radius-panel)] bg-card p-6 ring-1 ring-border">
+    <div className="bg-card ring-border w-full max-w-sm rounded-[var(--radius-panel)] p-6 ring-1">
       <div className="mb-6 space-y-2 text-center">
-        <div className="mx-auto flex size-10 items-center justify-center rounded-[var(--radius-nav)] bg-[var(--color-module-hover)] text-card-title">
+        <div className="text-card-title mx-auto flex size-10 items-center justify-center rounded-[var(--radius-nav)] bg-[var(--color-module-hover)]">
           Z
         </div>
         <h1 className="text-section text-foreground">Sign in to Zerosend</h1>
@@ -88,7 +87,7 @@ function LoginForm() {
           </p>
         ) : null}
         <Button className="w-full" disabled={pending} type="submit">
-          {pending ? "Signing in…" : "Sign in"}
+          {pending ? 'Signing in…' : 'Sign in'}
         </Button>
       </form>
     </div>

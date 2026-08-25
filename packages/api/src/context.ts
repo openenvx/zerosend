@@ -1,7 +1,7 @@
-import { createDb } from "@zerosend/db";
+import { createDb } from '@zerosend/db';
 
-import { AdminTokenAdapter } from "./auth/admin-token-adapter";
-import type { Principal } from "./auth/types";
+import { AdminTokenAdapter } from './auth/admin-token-adapter';
+import type { AdminPrincipal, Principal } from './auth/types';
 
 export async function createContext(options: { req: Request }) {
   const adminAdapter = new AdminTokenAdapter();
@@ -16,9 +16,9 @@ export async function createContext(options: { req: Request }) {
 
 export type Context = Awaited<ReturnType<typeof createContext>>;
 
-export function requireAdmin(principal: Principal | null): Principal {
-  if (!principal || principal.kind !== "admin") {
-    throw new Error("Unauthorized");
+export function requireAdmin(principal: Principal | null): AdminPrincipal {
+  if (!principal || principal.kind !== 'admin') {
+    throw new Error('Unauthorized');
   }
 
   return principal;

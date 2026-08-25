@@ -1,6 +1,6 @@
-import { cn } from "@zerosend/ui/lib/utils";
-import type { LucideIcon } from "lucide-react";
-import type { ReactNode } from "react";
+import { cn } from '@zerosend/ui/lib/utils';
+import type { LucideIcon } from 'lucide-react';
+import type { ReactNode } from 'react';
 
 interface EmptyStateProps {
   icon?: LucideIcon;
@@ -20,14 +20,14 @@ export function EmptyState({
   return (
     <div
       className={cn(
-        "flex flex-col items-center justify-center gap-3 px-6 py-10 text-center",
+        'flex flex-col items-center justify-center gap-3 px-6 py-10 text-center',
         className
       )}
     >
       {Icon ? (
         <Icon
           aria-hidden
-          className="size-6 text-muted-foreground"
+          className="text-muted-foreground size-6"
           strokeWidth={1.5}
         />
       ) : null}

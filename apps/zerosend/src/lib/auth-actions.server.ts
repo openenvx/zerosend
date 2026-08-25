@@ -1,18 +1,18 @@
-import { getRequest } from "@tanstack/react-start/server";
+import { getRequest } from '@tanstack/react-start/server';
 import {
   createAdminSessionToken,
   createSessionCookie,
   clearSessionCookie,
   isSecureRequest,
   verifyAdminToken,
-} from "@zerosend/api/auth";
+} from '@zerosend/api/auth';
 
 export async function loginWithToken(token: string): Promise<Response> {
   const request = getRequest();
 
   if (!verifyAdminToken(token)) {
     return Response.json(
-      { ok: false as const, error: "Invalid admin token" },
+      { error: 'Invalid admin token', ok: false as const },
       { status: 401 }
     );
   }
@@ -24,7 +24,7 @@ export async function loginWithToken(token: string): Promise<Response> {
     { ok: true as const },
     {
       headers: {
-        "Set-Cookie": createSessionCookie(sessionToken, secure),
+        'Set-Cookie': createSessionCookie(sessionToken, secure),
       },
     }
   );
@@ -38,7 +38,7 @@ export async function logoutSession(): Promise<Response> {
     { ok: true as const },
     {
       headers: {
-        "Set-Cookie": clearSessionCookie(secure),
+        'Set-Cookie': clearSessionCookie(secure),
       },
     }
   );

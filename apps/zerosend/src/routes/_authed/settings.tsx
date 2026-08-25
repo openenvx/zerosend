@@ -1,6 +1,6 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { createFileRoute } from "@tanstack/react-router";
-import { Button } from "@zerosend/ui/components/button";
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { createFileRoute } from '@tanstack/react-router';
+import { Button } from '@zerosend/ui/components/button';
 import {
   Dialog,
   DialogContent,
@@ -8,19 +8,19 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@zerosend/ui/components/dialog";
-import { EmptyState } from "@zerosend/ui/components/empty-state";
-import { Input } from "@zerosend/ui/components/input";
-import { Label } from "@zerosend/ui/components/label";
-import { PageHeader } from "@zerosend/ui/components/page-header";
-import { StatusDot } from "@zerosend/ui/components/status-dot";
-import { KeyRound, Plus } from "lucide-react";
-import { useEffect, useState } from "react";
-import { toast } from "sonner";
+} from '@zerosend/ui/components/dialog';
+import { EmptyState } from '@zerosend/ui/components/empty-state';
+import { Input } from '@zerosend/ui/components/input';
+import { Label } from '@zerosend/ui/components/label';
+import { PageHeader } from '@zerosend/ui/components/page-header';
+import { StatusDot } from '@zerosend/ui/components/status-dot';
+import { KeyRound, Plus } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { toast } from 'sonner';
 
-import { orpc } from "@/utils/orpc";
+import { orpc } from '@/utils/orpc';
 
-export const Route = createFileRoute("/_authed/settings")({
+export const Route = createFileRoute('/_authed/settings')({
   component: SettingsPage,
 });
 
@@ -32,49 +32,51 @@ function SettingsPage() {
   const [createOpen, setCreateOpen] = useState(false);
   const [createdKey, setCreatedKey] = useState<string | null>(null);
   const [revokeId, setRevokeId] = useState<string | null>(null);
-  const [keyName, setKeyName] = useState("");
-  const [defaultFrom, setDefaultFrom] = useState("");
+  const [keyName, setKeyName] = useState('');
+  const [keyType, setKeyType] = useState<'test' | 'live'>('test');
+  const [defaultFrom, setDefaultFrom] = useState('');
 
   useEffect(() => {
     if (settingsQuery.data) {
-      setDefaultFrom(settingsQuery.data.defaultFrom ?? "");
+      setDefaultFrom(settingsQuery.data.defaultFrom ?? '');
     }
   }, [settingsQuery.data]);
 
   const createKey = useMutation(
     orpc.keys.create.mutationOptions({
-      onSuccess: (result) => {
-        setCreatedKey(result.key);
-        setKeyName("");
-        queryClient.invalidateQueries({ queryKey: orpc.keys.list.key() });
-      },
       onError: (error) => {
         toast.error(error.message);
+      },
+      onSuccess: (result) => {
+        setCreatedKey(result.key);
+        setKeyName('');
+        setKeyType('test');
+        queryClient.invalidateQueries({ queryKey: orpc.keys.list.key() });
       },
     })
   );
 
   const revokeKey = useMutation(
     orpc.keys.revoke.mutationOptions({
+      onError: (error) => {
+        toast.error(error.message);
+      },
       onSuccess: () => {
         setRevokeId(null);
         queryClient.invalidateQueries({ queryKey: orpc.keys.list.key() });
-        toast.success("API key revoked");
-      },
-      onError: (error) => {
-        toast.error(error.message);
+        toast.success('API key revoked');
       },
     })
   );
 
   const updateSettings = useMutation(
     orpc.settings.update.mutationOptions({
-      onSuccess: () => {
-        queryClient.invalidateQueries({ queryKey: orpc.settings.get.key() });
-        toast.success("Settings saved");
-      },
       onError: (error) => {
         toast.error(error.message);
+      },
+      onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: orpc.settings.get.key() });
+        toast.success('Settings saved');
       },
     })
   );
@@ -88,12 +90,13 @@ function SettingsPage() {
         title="Settings"
       />
 
-      <section className="rounded-[var(--radius-panel)] bg-card p-4 ring-1 ring-border">
+      <section className="bg-card ring-border rounded-[var(--radius-panel)] p-4 ring-1">
         <h2 className="text-card-title text-foreground">
           Default from address
         </h2>
-        <p className="mt-1 text-body text-muted-foreground">
-          Used as the default sender when product apps omit `from` (Phase 2).
+        <p className="text-body text-muted-foreground mt-1">
+          Used as the default sender when product apps omit `from` on live
+          sends.
         </p>
         <form
           className="mt-4 flex flex-col gap-3 sm:flex-row sm:items-end"
@@ -101,7 +104,7 @@ function SettingsPage() {
             event.preventDefault();
             updateSettings.mutate({
               defaultFrom:
-                defaultFrom.trim() === "" ? null : defaultFrom.trim(),
+                defaultFrom.trim() === '' ? null : defaultFrom.trim(),
             });
           }}
         >
@@ -121,8 +124,8 @@ function SettingsPage() {
         </form>
       </section>
 
-      <section className="rounded-[var(--radius-panel)] bg-card ring-1 ring-border">
-        <div className="flex items-center justify-between gap-3 border-b border-border px-4 py-3">
+      <section className="bg-card ring-border rounded-[var(--radius-panel)] ring-1">
+        <div className="border-border flex items-center justify-between gap-3 border-b px-4 py-3">
           <div>
             <h2 className="text-card-title text-foreground">API keys</h2>
             <p className="text-body text-muted-foreground">
@@ -132,6 +135,7 @@ function SettingsPage() {
           <Button
             onClick={() => {
               setCreatedKey(null);
+              setKeyType('test');
               setCreateOpen(true);
             }}
             size="sm"
@@ -143,7 +147,7 @@ function SettingsPage() {
         </div>
 
         {keysQuery.isPending ? (
-          <div className="p-6 text-body text-muted-foreground">
+          <div className="text-body text-muted-foreground p-6">
             Loading keys…
           </div>
         ) : keys.length === 0 ? (
@@ -152,6 +156,7 @@ function SettingsPage() {
               <Button
                 onClick={() => {
                   setCreatedKey(null);
+                  setKeyType('test');
                   setCreateOpen(true);
                 }}
                 type="button"
@@ -164,7 +169,7 @@ function SettingsPage() {
             title="No API keys yet"
           />
         ) : (
-          <div className="divide-y divide-border">
+          <div className="divide-border divide-y">
             {keys.map((key) => (
               <div
                 className="flex flex-col gap-3 px-4 py-3 sm:flex-row sm:items-center sm:justify-between"
@@ -173,12 +178,15 @@ function SettingsPage() {
                 <div className="min-w-0 space-y-1">
                   <div className="flex flex-wrap items-center gap-2">
                     <p className="text-body text-foreground">{key.name}</p>
+                    <span className="text-kbd text-muted-foreground capitalize">
+                      {key.keyType}
+                    </span>
                     <StatusDot
-                      label={key.active ? "Active" : "Revoked"}
-                      tone={key.active ? "completed" : "cancelled"}
+                      label={key.active ? 'Active' : 'Revoked'}
+                      tone={key.active ? 'completed' : 'cancelled'}
                     />
                   </div>
-                  <p className="font-mono text-kbd text-muted-foreground">
+                  <p className="text-kbd text-muted-foreground font-mono">
                     {key.prefix}…
                   </p>
                   <p className="text-kbd text-muted-foreground">
@@ -205,7 +213,8 @@ function SettingsPage() {
           setCreateOpen(open);
           if (!open) {
             setCreatedKey(null);
-            setKeyName("");
+            setKeyName('');
+            setKeyType('test');
           }
         }}
         open={createOpen}
@@ -220,7 +229,7 @@ function SettingsPage() {
                 </DialogDescription>
               </DialogHeader>
               <div className="rounded-[var(--radius-control)] bg-[var(--color-module-hover)] p-3">
-                <code className="block break-all font-mono text-body text-foreground">
+                <code className="text-body text-foreground block font-mono break-all">
                   {createdKey}
                 </code>
               </div>
@@ -228,7 +237,7 @@ function SettingsPage() {
                 <Button
                   onClick={async () => {
                     await navigator.clipboard.writeText(createdKey);
-                    toast.success("Copied to clipboard");
+                    toast.success('Copied to clipboard');
                   }}
                   type="button"
                 >
@@ -258,7 +267,7 @@ function SettingsPage() {
                 className="space-y-4"
                 onSubmit={(event) => {
                   event.preventDefault();
-                  createKey.mutate({ name: keyName.trim() });
+                  createKey.mutate({ name: keyName.trim(), type: keyType });
                 }}
               >
                 <div className="space-y-2">
@@ -271,6 +280,34 @@ function SettingsPage() {
                     value={keyName}
                   />
                 </div>
+                <fieldset className="space-y-2">
+                  <legend className="text-body text-foreground">
+                    Key type
+                  </legend>
+                  <div className="flex gap-2">
+                    <Button
+                      aria-pressed={keyType === 'test'}
+                      onClick={() => setKeyType('test')}
+                      type="button"
+                      variant={keyType === 'test' ? 'default' : 'outline'}
+                    >
+                      Test
+                    </Button>
+                    <Button
+                      aria-pressed={keyType === 'live'}
+                      onClick={() => setKeyType('live')}
+                      type="button"
+                      variant={keyType === 'live' ? 'default' : 'outline'}
+                    >
+                      Live
+                    </Button>
+                  </div>
+                  <p className="text-kbd text-muted-foreground">
+                    {keyType === 'test'
+                      ? 'Test keys store messages in the mailbox. No outbound delivery.'
+                      : 'Live keys send real email through Cloudflare Email Sending.'}
+                  </p>
+                </fieldset>
                 <DialogFooter>
                   <Button disabled={createKey.isPending} type="submit">
                     Create key

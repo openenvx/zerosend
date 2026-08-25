@@ -1,7 +1,7 @@
-import { createFileRoute } from "@tanstack/react-router";
-import { ApiKeyAdapter } from "@zerosend/api/auth";
+import { createFileRoute } from '@tanstack/react-router';
+import { ApiKeyAdapter } from '@zerosend/api/auth';
 
-export const Route = createFileRoute("/v1/me")({
+export const Route = createFileRoute('/v1/me')({
   server: {
     handlers: {
       GET: async ({ request }) => {
@@ -9,12 +9,17 @@ export const Route = createFileRoute("/v1/me")({
         const principal = await adapter.authenticate(request);
 
         if (!principal) {
-          return Response.json({ error: "Unauthorized" }, { status: 401 });
+          return Response.json({ error: 'Unauthorized' }, { status: 401 });
+        }
+
+        if (principal.kind !== 'api_key') {
+          return Response.json({ error: 'Unauthorized' }, { status: 401 });
         }
 
         return Response.json({
-          kind: principal.kind,
           id: principal.id,
+          keyType: principal.keyType,
+          kind: principal.kind,
           scopes: principal.scopes,
         });
       },

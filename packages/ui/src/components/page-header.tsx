@@ -1,5 +1,5 @@
-import { cn } from "@zerosend/ui/lib/utils";
-import type { ReactNode } from "react";
+import { cn } from '@zerosend/ui/lib/utils';
+import type { ReactNode } from 'react';
 
 interface PageHeaderProps {
   title: string;
@@ -17,7 +17,7 @@ export function PageHeader({
   return (
     <div
       className={cn(
-        "flex flex-col gap-1 sm:flex-row sm:items-start sm:justify-between sm:gap-4",
+        'flex flex-col gap-1 sm:flex-row sm:items-start sm:justify-between sm:gap-4',
         className
       )}
     >

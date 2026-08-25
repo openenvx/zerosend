@@ -46,11 +46,13 @@ Sign in at `/login` with your `ADMIN_TOKEN`, then open **Settings** to create an
 
 ```bash
 export ZEROSEND_URL=http://localhost:3001
-export ZEROSEND_API_KEY=zs_live_…
+export ZEROSEND_API_KEY=zs_test_…
 
 curl -sS "$ZEROSEND_URL/v1/me" \
   -H "Authorization: Bearer $ZEROSEND_API_KEY"
 ```
+
+Phase 1 uses `zs_test_` keys for stored test sends in `/mailbox`. `zs_live_` keys send through Cloudflare Email Sending once your domain is onboarded.
 
 ## Manual deploy (Wrangler)
 

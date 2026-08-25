@@ -17,4 +17,5 @@
       "migrations_dir": "packages/db/src/migrations",
     },
   ],
+  "send_email": [{ "name": "EMAIL" }],
 }

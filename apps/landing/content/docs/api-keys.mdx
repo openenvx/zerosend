@@ -6,18 +6,27 @@ icon: KeyRound
 
 Zerosend uses two separate auth lanes on purpose:
 
-| Lane         | Who                  | Mechanism                             |
-| ------------ | -------------------- | ------------------------------------- |
-| Operator UI  | You                  | `ADMIN_TOKEN` → signed session cookie |
-| Product apps | Your Workers/servers | `Authorization: Bearer zs_live_…`     |
+| Lane | Who | Mechanism |
+| --- | --- | --- |
+| Operator UI | You | `ADMIN_TOKEN` → signed session cookie |
+| Product apps | Your Workers/servers | `Authorization: Bearer zs_test_…` or `zs_live_…` |
 
 Never put a send key in the browser as the only UI auth.
+
+## Key types
+
+| Prefix     | Behavior                                               |
+| ---------- | ------------------------------------------------------ |
+| `zs_test_` | Sends are stored in the mailbox - no outbound delivery |
+| `zs_live_` | Sends through Cloudflare Email Sending to a real inbox |
+
+Create **test** keys for development and integration checks. Create **live** keys when you are ready for real delivery.
 
 ## Create a key
 
 1. Sign in to the zerosend dashboard (`/login`)
 2. Open **Settings**
-3. Click **Create key** and copy the plaintext value — it is shown once
+3. Click **Create key**, choose **Test** or **Live**, and copy the plaintext value - it is shown once
 
 Keys are stored as SHA-256 hashes in D1. Zerosend only ever shows the prefix after creation.
 

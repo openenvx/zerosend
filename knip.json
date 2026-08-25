@@ -1,0 +1,30 @@
+{
+  "$schema": "https://unpkg.com/knip@6/schema.json",
+  "ignoreExportsUsedInFile": true,
+  "ignoreDependencies": ["@zerosend/config", "wrangler"],
+  "ignoreIssues": {
+    "apps/landing/src/components/mdx.tsx": ["duplicates"]
+  },
+  "workspaces": {
+    "packages/api": {
+      "entry": ["src/**/*.test.ts"]
+    },
+    "packages/env": {
+      "ignoreDependencies": ["cloudflare"]
+    },
+    "packages/ui": {
+      "ignoreDependencies": ["@fontsource-variable/inter"]
+    },
+    "apps/zerosend": {
+      "entry": ["src/index.css", "src/routes/**/*.{ts,tsx}"],
+      "ignoreDependencies": ["tailwindcss"]
+    },
+    "apps/landing": {
+      "entry": [
+        "src/styles/app.css",
+        "content/**/*.mdx",
+        "src/routes/**/*.{ts,tsx}"
+      ]
+    }
+  }
+}

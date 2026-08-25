@@ -1,23 +1,23 @@
-import { cn } from "@zerosend/ui/lib/utils";
-import type { ComponentProps } from "react";
+import { cn } from '@zerosend/ui/lib/utils';
+import type { ComponentProps } from 'react';
 
 const toneClasses = {
-  pending: "bg-[var(--status-pending)]",
-  active: "bg-[var(--status-active)]",
-  completed: "bg-[var(--status-completed)]",
-  failed: "bg-[var(--status-failed)]",
-  cancelled: "bg-[var(--status-cancelled)]",
+  active: 'bg-[var(--status-active)]',
+  cancelled: 'bg-[var(--status-cancelled)]',
+  completed: 'bg-[var(--status-completed)]',
+  failed: 'bg-[var(--status-failed)]',
+  pending: 'bg-[var(--status-pending)]',
 } as const;
 
 export type StatusDotTone = keyof typeof toneClasses;
 
-interface StatusDotProps extends ComponentProps<"span"> {
+interface StatusDotProps extends ComponentProps<'span'> {
   tone?: StatusDotTone;
   label?: string;
 }
 
 export function StatusDot({
-  tone = "pending",
+  tone = 'pending',
   label,
   className,
   ...props
@@ -27,7 +27,7 @@ export function StatusDot({
       <span
         aria-hidden
         className={cn(
-          "size-2 shrink-0 rounded-full",
+          'size-2 shrink-0 rounded-full',
           toneClasses[tone],
           className
         )}

@@ -8,6 +8,20 @@
       "when": 1787669557294,
       "tag": "0000_nifty_marvel_boy",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "6",
+      "when": 1787684418309,
+      "tag": "0001_phase1_email_logs",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1787685921847,
+      "tag": "0002_phase2_live_logs",
+      "breakpoints": true
     }
   ]
 }

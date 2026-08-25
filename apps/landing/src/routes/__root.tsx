@@ -3,47 +3,51 @@ import {
   HeadContent,
   Outlet,
   Scripts,
-} from "@tanstack/react-router";
-import { RootProvider } from "fumadocs-ui/provider/tanstack";
+} from '@tanstack/react-router';
+import { RootProvider } from 'fumadocs-ui/provider/tanstack';
+import type { ReactNode } from 'react';
 
-import appCss from "@/styles/app.css?url";
+import { SITE } from '@/lib/site';
 
-export const Route = createRootRoute({
-  head: () => ({
-    meta: [
-      {
-        charSet: "utf-8",
-      },
-      {
-        name: "viewport",
-        content: "width=device-width, initial-scale=1",
-      },
-      {
-        title: "Zerosend — self-hosted email for your stack",
-      },
-      {
-        name: "description",
-        content:
-          "Deploy once. Send transactional email and automations from your existing apps with a simple REST API.",
-      },
-    ],
-    links: [{ rel: "stylesheet", href: appCss }],
-  }),
-  component: RootComponent,
-});
+import appCss from '@/styles/app.css?url';
 
-function RootComponent() {
+function RootDocument({ children }: { children: ReactNode }) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html className="dark" lang="en" suppressHydrationWarning>
       <head>
         <HeadContent />
       </head>
-      <body className="flex min-h-screen flex-col">
-        <RootProvider>
-          <Outlet />
-        </RootProvider>
+      <body className="bg-marketing-surface-base font-roobert text-paper-white flex min-h-screen flex-col antialiased">
+        <RootProvider theme={{ defaultTheme: 'dark' }}>{children}</RootProvider>
         <Scripts />
       </body>
     </html>
   );
 }
+
+function RootComponent() {
+  return (
+    <RootDocument>
+      <Outlet />
+    </RootDocument>
+  );
+}
+
+export const Route = createRootRoute({
+  component: RootComponent,
+  head: () => ({
+    links: [
+      { href: appCss, rel: 'stylesheet' },
+      { href: '/extension_icon.ico', rel: 'icon', type: 'image/x-icon' },
+    ],
+    meta: [
+      { charSet: 'utf-8' },
+      {
+        content: 'width=device-width, initial-scale=1',
+        name: 'viewport',
+      },
+      { title: `${SITE.name} - ${SITE.tagline}` },
+      { content: SITE.description, name: 'description' },
+    ],
+  }),
+});

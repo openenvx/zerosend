@@ -1,13 +1,13 @@
-import { settings } from "@zerosend/db/schema";
-import { eq } from "drizzle-orm";
-import { z } from "zod";
+import { settings } from '@zerosend/db/schema';
+import { eq } from 'drizzle-orm';
+import { z } from 'zod';
 
-import type { Context } from "../context";
-import { adminProcedure } from "../procedures";
+import type { Context } from '../context';
+import { adminProcedure } from '../procedures';
 
-const SETTINGS_ID = "default";
+const SETTINGS_ID = 'default';
 
-async function ensureSettingsRow(db: Context["db"]) {
+async function ensureSettingsRow(db: Context['db']) {
   const [row] = await db
     .select()
     .from(settings)
@@ -18,14 +18,14 @@ async function ensureSettingsRow(db: Context["db"]) {
     return row;
   }
 
-  await db.insert(settings).values({ id: SETTINGS_ID, defaultFrom: null });
+  await db.insert(settings).values({ defaultFrom: null, id: SETTINGS_ID });
   const [created] = await db
     .select()
     .from(settings)
     .where(eq(settings.id, SETTINGS_ID))
     .limit(1);
 
-  return created ?? { id: SETTINGS_ID, defaultFrom: null };
+  return created ?? { defaultFrom: null, id: SETTINGS_ID };
 }
 
 export const settingsRouter = {
@@ -40,8 +40,8 @@ export const settingsRouter = {
     .input(
       z.object({
         defaultFrom: z
-          .union([z.string().email(), z.literal("")])
-          .transform((value) => (value === "" ? null : value)),
+          .union([z.string().email(), z.literal('')])
+          .transform((value) => (value === '' ? null : value)),
       })
     )
     .handler(async ({ context, input }) => {

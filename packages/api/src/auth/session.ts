@@ -1,9 +1,9 @@
-import { env } from "@zerosend/env/server";
-import { SignJWT, jwtVerify } from "jose";
+import { env } from '@zerosend/env/server';
+import { SignJWT, jwtVerify } from 'jose';
 
-import type { Principal } from "./types";
+import type { Principal } from './types';
 
-export const SESSION_COOKIE = "zs_session";
+export const SESSION_COOKIE = 'zs_session';
 const SESSION_MAX_AGE_SECONDS = 60 * 60 * 24 * 7;
 
 function getSessionSecret(): Uint8Array {
@@ -11,8 +11,8 @@ function getSessionSecret(): Uint8Array {
 }
 
 export async function createAdminSessionToken(): Promise<string> {
-  return new SignJWT({ kind: "admin", id: "admin", scopes: ["admin"] })
-    .setProtectedHeader({ alg: "HS256" })
+  return new SignJWT({ id: 'admin', kind: 'admin', scopes: ['admin'] })
+    .setProtectedHeader({ alg: 'HS256' })
     .setIssuedAt()
     .setExpirationTime(`${SESSION_MAX_AGE_SECONDS}s`)
     .sign(getSessionSecret());
@@ -23,18 +23,18 @@ export async function verifyAdminSessionToken(
 ): Promise<Principal | null> {
   try {
     const { payload } = await jwtVerify(token, getSessionSecret());
-    if (payload.kind !== "admin" || payload.id !== "admin") {
+    if (payload.kind !== 'admin' || payload.id !== 'admin') {
       return null;
     }
 
     return {
-      kind: "admin",
-      id: "admin",
+      id: 'admin',
+      kind: 'admin',
       scopes: Array.isArray(payload.scopes)
         ? payload.scopes.filter(
-            (scope): scope is string => typeof scope === "string"
+            (scope): scope is string => typeof scope === 'string'
           )
-        : ["admin"],
+        : ['admin'],
     };
   } catch {
     return null;
@@ -42,15 +42,15 @@ export async function verifyAdminSessionToken(
 }
 
 export function getSessionCookie(request: Request): string | null {
-  const cookieHeader = request.headers.get("cookie");
+  const cookieHeader = request.headers.get('cookie');
   if (!cookieHeader) {
     return null;
   }
 
-  for (const part of cookieHeader.split(";")) {
-    const [name, ...rest] = part.trim().split("=");
+  for (const part of cookieHeader.split(';')) {
+    const [name, ...rest] = part.trim().split('=');
     if (name === SESSION_COOKIE) {
-      return rest.join("=");
+      return rest.join('=');
     }
   }
 
@@ -60,33 +60,33 @@ export function getSessionCookie(request: Request): string | null {
 export function createSessionCookie(token: string, secure: boolean): string {
   const parts = [
     `${SESSION_COOKIE}=${token}`,
-    "Path=/",
-    "HttpOnly",
-    "SameSite=Lax",
+    'Path=/',
+    'HttpOnly',
+    'SameSite=Lax',
     `Max-Age=${SESSION_MAX_AGE_SECONDS}`,
   ];
 
   if (secure) {
-    parts.push("Secure");
+    parts.push('Secure');
   }
 
-  return parts.join("; ");
+  return parts.join('; ');
 }
 
 export function clearSessionCookie(secure: boolean): string {
   const parts = [
     `${SESSION_COOKIE}=`,
-    "Path=/",
-    "HttpOnly",
-    "SameSite=Lax",
-    "Max-Age=0",
+    'Path=/',
+    'HttpOnly',
+    'SameSite=Lax',
+    'Max-Age=0',
   ];
 
   if (secure) {
-    parts.push("Secure");
+    parts.push('Secure');
   }
 
-  return parts.join("; ");
+  return parts.join('; ');
 }
 
 export function timingSafeEqual(a: string, b: string): boolean {
@@ -107,10 +107,10 @@ export function verifyAdminToken(token: string): boolean {
 }
 
 export function isSecureRequest(request: Request): boolean {
-  const forwardedProto = request.headers.get("x-forwarded-proto");
+  const forwardedProto = request.headers.get('x-forwarded-proto');
   if (forwardedProto) {
-    return forwardedProto.split(",")[0]?.trim() === "https";
+    return forwardedProto.split(',')[0]?.trim() === 'https';
   }
 
-  return new URL(request.url).protocol === "https:";
+  return new URL(request.url).protocol === 'https:';
 }

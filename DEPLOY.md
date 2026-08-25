@@ -39,7 +39,7 @@ If you need to apply migrations outside the deploy script (e.g. after pulling sc
 bun run db:migrate:remote
 ```
 
-If migration commands fail with “database not found”, copy the D1 database ID from **Workers & Pages → zerosend → Settings → Bindings → DB** into `apps/zerosend/wrangler.jsonc` **locally only** — do not commit account-specific IDs to a public template.
+If migration commands fail with “database not found”, copy the D1 database ID from **Workers & Pages → zerosend → Settings → Bindings → DB** into `apps/zerosend/wrangler.jsonc` **locally only** - do not commit account-specific IDs to a public template.
 
 ## Prerequisites (manual deploy)
 
@@ -65,7 +65,7 @@ bun run migrate
 bun run dev
 ```
 
-Open http://localhost:3001 — sign in with `ADMIN_TOKEN`.
+Open http://localhost:3001 - sign in with `ADMIN_TOKEN`.
 
 Landing + docs (optional): `bun run dev:landing` → http://localhost:3000
 
@@ -106,10 +106,32 @@ Use a long random admin password and `openssl rand -hex 32` for the session secr
 Wrangler prints your Worker URL (e.g. `https://zerosend.<subdomain>.workers.dev`). That is your `ZEROSEND_URL`.
 
 ```bash
-curl -sS "$ZEROSEND_URL/v1/me" -H "Authorization: Bearer zs_live_…"
+curl -sS "$ZEROSEND_URL/v1/me" -H "Authorization: Bearer zs_test_…"
 ```
 
-Create API keys in the dashboard **Settings** page after signing in at `$ZEROSEND_URL/login`.
+Create API keys in the dashboard **Settings** page after signing in at `$ZEROSEND_URL/login`. Use a `zs_test_` key for stored test sends in `/mailbox`. Use a `zs_live_` key for real delivery through Cloudflare Email Sending.
+
+### Live email sending
+
+Before live sends work:
+
+1. **Workers paid plan** - Email Sending requires a paid Workers plan.
+2. **Onboard a domain** - `wrangler email sending enable yourdomain.com` or Dashboard → Email Service → Onboard Domain.
+3. **Default from** - In dashboard **Settings**, set the default from address to an onboarded domain (used when API calls omit `from`).
+4. **Deploy** - The Worker includes a `send_email` binding named `EMAIL` in `wrangler.jsonc`.
+
+```bash
+curl -sS "$ZEROSEND_URL/v1/emails" \
+  -H "Authorization: Bearer $ZEROSEND_LIVE_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "to": "you@example.com",
+    "subject": "Live test",
+    "text": "Hello from zerosend"
+  }'
+```
+
+Local dev simulates `env.EMAIL.send()` unless you add `"remote": true` to the `send_email` binding (then real emails are sent).
 
 ## 4. Deploy landing (optional)
 
@@ -155,12 +177,12 @@ Set `ZEROSEND_URL=https://zerosend.yourdomain.com` in product apps that send mai
 
 ## Troubleshooting
 
-**`env.DB` / D1 errors locally** — run `bun run db:migrate:local` from the repo root.
+**`env.DB` / D1 errors locally** - run `bun run db:migrate:local` from the repo root.
 
-**401 on `/v1/me`** — use a live `zs_live_…` key from Settings, not the admin token.
+**401 on `/v1/me`** - use a `zs_test_…` or `zs_live_…` API key from Settings, not the admin token.
 
-**D1 error 7404: database could not be found** — remove any committed `database_id` from `wrangler.jsonc`. D1 IDs are account-specific; the template uses `database_name` only so Cloudflare can provision per account.
+**D1 error 7404: database could not be found** - remove any committed `database_id` from `wrangler.jsonc`. D1 IDs are account-specific; the template uses `database_name` only so Cloudflare can provision per account.
 
-**Deploy button build fails on monorepo** — use the root deploy URL (no `path=`). The product Worker needs the full repo so `@zerosend/*` workspace packages install correctly.
+**Deploy button build fails on monorepo** - use the root deploy URL (no `path=`). The product Worker needs the full repo so `@zerosend/*` workspace packages install correctly.
 
-**Schema changes** — `bun run db:generate`, commit the new SQL under `packages/db/src/migrations`, then redeploy or `bun run db:migrate:remote`.
+**Schema changes** - `bun run db:generate`, commit the new SQL under `packages/db/src/migrations`, then redeploy or `bun run db:migrate:remote`.
