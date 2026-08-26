@@ -1,3 +1,5 @@
 # Operator secrets for wrangler dev - also listed in repo root .dev.vars.example for Deploy to Cloudflare.
 ADMIN_TOKEN=change-me-to-a-long-random-string
 SESSION_SECRET=change-me-run-openssl-rand-hex-32
+# Cloudflare API token for domain onboarding (Email Sending subdomains + DNS). Not required for zs_test_ sends.
+CF_API_TOKEN=

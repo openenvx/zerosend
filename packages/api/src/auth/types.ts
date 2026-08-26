@@ -8,11 +8,11 @@ export interface AdminPrincipal {
 }
 
 export interface ApiKeyPrincipal {
-  kind: 'api_key';
   id: string;
-  scopes: string[];
-  keyType: ApiKeyType;
   keyPrefix: string;
+  keyType: ApiKeyType;
+  kind: 'api_key';
+  scopes: string[];
 }
 
 export interface ExternalPrincipal {

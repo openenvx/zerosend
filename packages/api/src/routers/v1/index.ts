@@ -17,6 +17,7 @@ import {
   sendEmail,
   SendEmailDeliveryError,
   sendEmailInputSchema,
+  UnverifiedFromDomainError,
   type SendEmailInput,
 } from '../../send/send-email';
 import type { V1Context } from '../../v1-context';
@@ -26,6 +27,7 @@ type V1ErrorCode =
   | 'BAD_REQUEST'
   | 'BAD_GATEWAY'
   | 'CONFLICT'
+  | 'FORBIDDEN'
   | 'INTERNAL_SERVER_ERROR'
   | 'SERVICE_UNAVAILABLE'
   | 'TOO_MANY_REQUESTS';
@@ -33,6 +35,10 @@ type V1ErrorCode =
 function mapHttpStatusToErrorCode(status: number): V1ErrorCode {
   if (status === 400) {
     return 'BAD_REQUEST';
+  }
+
+  if (status === 403) {
+    return 'FORBIDDEN';
   }
 
   if (status === 409) {
@@ -69,6 +75,10 @@ function mapSendError(error: unknown): {
   status: number;
 } {
   if (error instanceof MissingFromAddressError) {
+    return { body: { error: error.message }, status: 400 };
+  }
+
+  if (error instanceof UnverifiedFromDomainError) {
     return { body: { error: error.message }, status: 400 };
   }
 

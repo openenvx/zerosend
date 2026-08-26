@@ -79,6 +79,7 @@ zerosend/
 | --- | --- | --- |
 | `ADMIN_TOKEN` | `.dev.vars` / deploy secrets | Operator dashboard login |
 | `SESSION_SECRET` | `.dev.vars` / deploy secrets | JWT cookie signing |
+| `CF_API_TOKEN` | `.dev.vars` / deploy secrets (optional) | Onboard domains in dashboard; not needed for `zs_test_` sends |
 | `DB` | wrangler D1 binding | API keys, settings, email logs |
 | `EMAIL` | wrangler `send_email` binding | Cloudflare Email Sending for `zs_live_` keys |
 
@@ -112,9 +113,9 @@ Sign in to the dashboard and open **Mailbox** to preview test sends. Use a `zs_l
 
 ### Live send (`zs_live_`)
 
-1. Onboard a sending domain: `wrangler email sending enable yourdomain.com` (or Dashboard → Email Service → Onboard Domain).
-2. Set **Settings → Default from address** to an address on that domain (used when `from` is omitted).
-3. Create a **live** API key and send:
+1. Open **Domains** in the dashboard and add a sending domain on this Cloudflare account (`CF_API_TOKEN` required). Copy DNS records, then **Verify**.
+2. Set **Settings → Default from address** to an address on that verified domain (used when `from` is omitted).
+3. Create a **live** API key for each product project and send:
 
 ```bash
 export ZEROSEND_API_KEY=zs_live_…

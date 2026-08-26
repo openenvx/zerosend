@@ -2,16 +2,47 @@ import { describe, expect, it, vi } from 'vitest';
 
 import { buildSendEmailMessage } from './build-send-message';
 import type { SendEmailBinding } from './email-binding';
-import { MissingFromAddressError, SendEmailDeliveryError } from './errors';
+import {
+  MissingFromAddressError,
+  SendEmailDeliveryError,
+  UnverifiedFromDomainError,
+} from './errors';
 import { sendEmail } from './send-email';
 import { normalizeRecipients, sendEmailInputSchema } from './send-email-input';
 import { storeTestEmail } from './store-test-email';
 
 function createMockDb(options: {
   defaultFrom?: string | null;
+  domainRows?: {
+    id: string;
+    name: string;
+    verified: number;
+  }[];
   onInsert?: (values: Record<string, unknown>) => void;
+  withVerifiedDomain?: boolean;
 }) {
   const insertedValues: Record<string, unknown>[] = [];
+  const selectQueue: unknown[][] = [];
+
+  if ('defaultFrom' in options) {
+    selectQueue.push(
+      options.defaultFrom ? [{ defaultFrom: options.defaultFrom }] : []
+    );
+  }
+
+  if (options.domainRows !== undefined) {
+    selectQueue.push(options.domainRows);
+  } else if (options.withVerifiedDomain ?? true) {
+    selectQueue.push([
+      {
+        id: 'domain-1',
+        name: 'example.com',
+        verified: 1,
+      },
+    ]);
+  }
+
+  let selectIndex = 0;
 
   const mockDb = {
     insert: () => ({
@@ -24,10 +55,11 @@ function createMockDb(options: {
     select: () => ({
       from: () => ({
         where: () => ({
-          limit: () =>
-            Promise.resolve(
-              options.defaultFrom ? [{ defaultFrom: options.defaultFrom }] : []
-            ),
+          limit: () => {
+            const result = selectQueue[selectIndex] ?? [];
+            selectIndex += 1;
+            return Promise.resolve(result);
+          },
         }),
       }),
     }),
@@ -266,7 +298,10 @@ describe('sendEmail live path', () => {
   it('throws MissingFromAddressError when from and default are missing', async () => {
     const send = vi.fn();
     const emailBinding: SendEmailBinding = { send };
-    const { mockDb } = createMockDb({});
+    const { mockDb } = createMockDb({
+      defaultFrom: null,
+      withVerifiedDomain: false,
+    });
 
     await expect(
       sendEmail(
@@ -284,6 +319,40 @@ describe('sendEmail live path', () => {
         { emailBinding }
       )
     ).rejects.toBeInstanceOf(MissingFromAddressError);
+
+    expect(send).not.toHaveBeenCalled();
+  });
+
+  it('rejects live send when from domain is not verified', async () => {
+    const send = vi.fn();
+    const emailBinding: SendEmailBinding = { send };
+    const { mockDb } = createMockDb({
+      domainRows: [
+        {
+          id: 'domain-1',
+          name: 'example.com',
+          verified: 0,
+        },
+      ],
+    });
+
+    await expect(
+      sendEmail(
+        mockDb,
+        {
+          from: 'hello@example.com',
+          html: '<p>Hi</p>',
+          subject: 'Hello',
+          to: ['user@example.com'],
+        },
+        {
+          keyId: 'key-id',
+          keyPrefix: 'zs_live_abc',
+          keyType: 'live',
+        },
+        { emailBinding }
+      )
+    ).rejects.toBeInstanceOf(UnverifiedFromDomainError);
 
     expect(send).not.toHaveBeenCalled();
   });

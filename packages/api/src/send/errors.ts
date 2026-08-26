@@ -5,6 +5,20 @@ export class MissingFromAddressError extends Error {
   }
 }
 
+export class UnverifiedFromDomainError extends Error {
+  constructor() {
+    super('from domain is not verified');
+    this.name = 'UnverifiedFromDomainError';
+  }
+}
+
+export class InvalidDefaultFromDomainError extends Error {
+  constructor() {
+    super('default from address must be on a verified domain');
+    this.name = 'InvalidDefaultFromDomainError';
+  }
+}
+
 export class SendEmailDeliveryError extends Error {
   readonly code: string;
   readonly httpStatus: number;

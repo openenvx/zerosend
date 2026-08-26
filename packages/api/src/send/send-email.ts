@@ -9,7 +9,11 @@ import type { SendEmailKeyContext } from './store-test-email';
 
 type Db = ReturnType<typeof createDb>;
 
-export { MissingFromAddressError, SendEmailDeliveryError } from './errors';
+export {
+  MissingFromAddressError,
+  SendEmailDeliveryError,
+  UnverifiedFromDomainError,
+} from './errors';
 export {
   formatToAddressForLog,
   normalizeRecipients,

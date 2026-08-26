@@ -83,6 +83,12 @@ function SettingsPage() {
 
   const keys = keysQuery.data ?? [];
 
+  function resetCreateKeyForm() {
+    setCreatedKey(null);
+    setKeyName('');
+    setKeyType('test');
+  }
+
   return (
     <div className="space-y-8">
       <PageHeader
@@ -96,8 +102,16 @@ function SettingsPage() {
         </h2>
         <p className="text-body text-muted-foreground mt-1">
           Used as the default sender when product apps omit `from` on live
-          sends.
+          sends. Must be on a verified domain from Domains.
         </p>
+        {settingsQuery.data?.defaultFrom &&
+        settingsQuery.data.defaultFromValid === false ? (
+          <p className="text-body text-destructive mt-2">
+            The saved default from address is not on a verified domain. Live
+            sends that omit `from` will fail until you verify the domain in
+            Domains or update this address.
+          </p>
+        ) : null}
         <form
           className="mt-4 flex flex-col gap-3 sm:flex-row sm:items-end"
           onSubmit={(event) => {
@@ -134,8 +148,7 @@ function SettingsPage() {
           </div>
           <Button
             onClick={() => {
-              setCreatedKey(null);
-              setKeyType('test');
+              resetCreateKeyForm();
               setCreateOpen(true);
             }}
             size="sm"
@@ -155,8 +168,7 @@ function SettingsPage() {
             action={
               <Button
                 onClick={() => {
-                  setCreatedKey(null);
-                  setKeyType('test');
+                  resetCreateKeyForm();
                   setCreateOpen(true);
                 }}
                 type="button"
@@ -212,9 +224,7 @@ function SettingsPage() {
         onOpenChange={(open) => {
           setCreateOpen(open);
           if (!open) {
-            setCreatedKey(null);
-            setKeyName('');
-            setKeyType('test');
+            resetCreateKeyForm();
           }
         }}
         open={createOpen}
@@ -267,7 +277,10 @@ function SettingsPage() {
                 className="space-y-4"
                 onSubmit={(event) => {
                   event.preventDefault();
-                  createKey.mutate({ name: keyName.trim(), type: keyType });
+                  createKey.mutate({
+                    name: keyName.trim(),
+                    type: keyType,
+                  });
                 }}
               >
                 <div className="space-y-2">

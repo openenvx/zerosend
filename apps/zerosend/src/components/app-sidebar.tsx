@@ -24,6 +24,7 @@ import {
 import { cn } from '@zerosend/ui/lib/utils';
 import {
   FileText,
+  Globe,
   Inbox,
   KeyIcon,
   ScrollText,
@@ -54,6 +55,11 @@ const primaryNavItems: NavItem[] = [
     icon: <Inbox size={16} />,
     label: 'Mailbox',
     to: '/mailbox',
+  },
+  {
+    icon: <Globe size={16} />,
+    label: 'Domains',
+    to: '/domains',
   },
   {
     disabled: true,

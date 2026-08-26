@@ -2,6 +2,7 @@
 
 declare global {
   interface Env {
+    CF_API_TOKEN?: string;
     DB: D1Database;
     EMAIL: SendEmail;
     RATE_LIMIT_KV: KVNamespace;

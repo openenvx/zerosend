@@ -112,7 +112,7 @@ EmailFlare-small, one nav, no user/org settings:
 - [x] `/login` - admin token
 - [x] `/` - logs (empty until Phase 1; project-filtered from Phase 5)
 - [x] `/mailbox` - Phase 1 test inbox
-- [ ] `/domains` - Phase 4 (instance-wide)
+- [x] `/domains` - Phase 4 (instance-wide)
 - [ ] `/templates` - Phase 6 (current project)
 - [ ] `/automations` - Phase 7 list; Phase 8 canvas (current project)
 - [x] `/settings` - API keys + default from address (keys are per-project from Phase 5)
@@ -186,9 +186,8 @@ EmailFlare’s test keys / in-house mailbox: [emailflare.dev](https://www.emailf
 
 **You can:** add every sending domain on **this** Cloudflare account in the UI, copy DKIM / return-path records, see verify status - no Wrangler/CLI for DNS.
 
-- [ ] `/domains` - add, list, DNS records, verified/pending (N domains, one instance)
-- [ ] Keys may be scoped `global` | per-domain | `multi` (EmailFlare model)
-- [ ] Live send rejects `from` that is not on a verified domain for this account
+- [x] `/domains` - add, list, DNS records, verified/pending (N domains, one instance)
+- [x] Live send rejects `from` that is not on a verified domain for this account
 
 **Does not include:** projects (Phase 5), templates (Phase 6), automations (Phase 7+). **Not planned:** provisioning a _different_ Cloudflare account (deploy another instance).
 

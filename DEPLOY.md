@@ -20,10 +20,11 @@ Most integrations only need the **zerosend** Worker URL.
 3. Connect GitHub/GitLab and authorize Cloudflare Workers Builds.
 4. Enter secrets when prompted (from [`.dev.vars.example`](./.dev.vars.example)):
 
-   | Secret           | Purpose                                     |
-   | ---------------- | ------------------------------------------- |
-   | `ADMIN_TOKEN`    | Dashboard login at `/login`                 |
+   | Secret | Purpose |
+   | --- | --- |
+   | `ADMIN_TOKEN` | Dashboard login at `/login` |
    | `SESSION_SECRET` | JWT cookie signing (`openssl rand -hex 32`) |
+   | `CF_API_TOKEN` | Cloudflare API token for **Domains** onboarding (optional for test sends) |
 
 5. Cloudflare reads [`wrangler.jsonc`](./wrangler.jsonc), **auto-provisions D1**, runs the root `build` + `deploy` scripts (including D1 migrations), and deploys the Worker.
 
@@ -97,6 +98,7 @@ On first deploy, Wrangler creates the `zerosend` D1 database from `wrangler.json
 cd apps/zerosend
 bunx wrangler secret put ADMIN_TOKEN
 bunx wrangler secret put SESSION_SECRET
+bunx wrangler secret put CF_API_TOKEN
 ```
 
 Use a long random admin password and `openssl rand -hex 32` for the session secret.
@@ -116,9 +118,13 @@ Create API keys in the dashboard **Settings** page after signing in at `$ZEROSEN
 Before live sends work:
 
 1. **Workers paid plan** - Email Sending requires a paid Workers plan.
-2. **Onboard a domain** - `wrangler email sending enable yourdomain.com` or Dashboard → Email Service → Onboard Domain.
-3. **Default from** - In dashboard **Settings**, set the default from address to an onboarded domain (used when API calls omit `from`).
+2. **Onboard a domain in the dashboard** - **Domains** → Add domain (requires `CF_API_TOKEN`). Copy DNS records, then **Verify**. Live sends require a verified row in zerosend D1 — `wrangler email sending enable` alone does not satisfy the gate.
+3. **Default from** - In **Settings**, set the default from address to a **verified** domain (used when API calls omit `from`).
 4. **Deploy** - The Worker includes a `send_email` binding named `EMAIL` in `wrangler.jsonc`.
+
+**Upgrading from pre-Phase-4 deploys:** If you previously onboarded sending only via `wrangler email sending enable`, re-add each sending hostname in **Domains** and verify before live sends will work. Clear or update **Settings → Default from** if it points at a domain not yet in the dashboard.
+
+`CF_API_TOKEN` needs Account Email Security Edit, Zone Email Routing Rules Edit, Zone Read, and DNS Read/Write.
 
 ```bash
 curl -sS "$ZEROSEND_URL/v1/emails" \

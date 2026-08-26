@@ -1,5 +1,6 @@
 import type { createDb } from '@zerosend/db';
 
+import { assertLiveSendDomainAllowed } from './assert-live-send-domain';
 import { buildSendEmailMessage } from './build-send-message';
 import type { SendEmailBinding } from './email-binding';
 import {
@@ -20,6 +21,8 @@ export async function sendLiveEmail(
   emailBinding: SendEmailBinding
 ): Promise<{ id: string }> {
   const fromAddress = await resolveFromAddress(db, input.from);
+
+  await assertLiveSendDomainAllowed(db, fromAddress);
 
   try {
     const response = await emailBinding.send(
