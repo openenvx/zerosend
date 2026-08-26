@@ -13,13 +13,13 @@ import {
 
 function WorkerVisual() {
   return (
-    <div className="border-marketing-divider bg-marketing-surface-base flex min-h-[168px] flex-col justify-center gap-2 rounded-md border p-4">
+    <div className="border-marketing-divider bg-marketing-surface-base flex min-h-42 flex-col justify-center gap-2 rounded-md border p-4">
       <div className="border-accent/50 bg-accent/10 flex items-center gap-3 rounded-md border px-3 py-2.5">
         <Server aria-hidden className="text-accent size-4" />
         <div className="min-w-0 flex-1">
           <p className="f-heading-sm text-paper-white">apps/zerosend</p>
           <p className="f-label text-marketing-subtler mt-0.5 tracking-normal normal-case">
-            dashboard · /v1 · queues
+            dashboard · /v1 · delivery
           </p>
         </div>
       </div>
@@ -38,8 +38,8 @@ function WorkerVisual() {
 
 function ApiVisual() {
   return (
-    <div className="border-marketing-divider bg-marketing-surface-base flex min-h-[168px] items-center justify-center rounded-md border p-4">
-      <div className="border-marketing-divider bg-marketing-surface-raised w-full max-w-[280px] rounded-md border px-4 py-3 font-mono text-[12px] leading-[1.9]">
+    <div className="border-marketing-divider bg-marketing-surface-base flex min-h-42 items-center justify-center rounded-md border p-4">
+      <div className="border-marketing-divider bg-marketing-surface-raised w-full max-w-70 rounded-md border px-4 py-3 font-mono text-[12px] leading-[1.9]">
         <div>
           <span className="text-electric-blue">POST</span>
           <span className="text-marketing-subtle"> /v1/emails</span>
@@ -54,7 +54,7 @@ function ApiVisual() {
 
 function KeysVisual() {
   return (
-    <div className="border-marketing-divider bg-marketing-surface-base flex min-h-[140px] flex-col justify-center gap-2 rounded-md border p-4">
+    <div className="border-marketing-divider bg-marketing-surface-base flex min-h-35 flex-col justify-center gap-2 rounded-md border p-4">
       <div className="bg-marketing-surface-raised flex items-center justify-between rounded-md px-3 py-2">
         <span className="text-paper-white flex items-center gap-2 font-mono text-[12px]">
           <KeyRound aria-hidden className="text-marketing-subtlest size-3.5" />
@@ -75,7 +75,7 @@ function KeysVisual() {
 
 function DashboardVisual() {
   return (
-    <div className="border-marketing-divider bg-marketing-surface-base flex min-h-[140px] flex-col justify-center gap-2 rounded-md border p-4">
+    <div className="border-marketing-divider bg-marketing-surface-base flex min-h-35 flex-col justify-center gap-2 rounded-md border p-4">
       {[
         { done: true, label: 'Sign in' },
         { done: true, label: 'Create an API key' },
@@ -102,7 +102,7 @@ function DashboardVisual() {
 
 function LogsVisual() {
   return (
-    <div className="border-marketing-divider bg-marketing-surface-base flex min-h-[140px] flex-col justify-center gap-2 rounded-md border p-3">
+    <div className="border-marketing-divider bg-marketing-surface-base flex min-h-35 flex-col justify-center gap-2 rounded-md border p-3">
       <div className="bg-marketing-surface-raised flex items-center gap-2 rounded-md px-3 py-2">
         <span className="bg-electric-blue size-1.5 rounded-full" />
         <span className="text-paper-white min-w-0 flex-1 truncate text-[12px]">
@@ -125,11 +125,61 @@ function LogsVisual() {
   );
 }
 
+function TemplatesVisual() {
+  return (
+    <div
+      aria-hidden
+      className="border-marketing-divider bg-marketing-surface-base flex min-h-42 flex-col justify-center gap-2 rounded-md border p-4"
+    >
+      <div className="bg-marketing-surface-raised flex items-center gap-2 rounded-md px-3 py-2.5">
+        <Mail aria-hidden className="text-electric-blue size-3.5" />
+        <span className="text-paper-white min-w-0 flex-1 truncate text-[12px]">
+          Welcome email
+        </span>
+        <span className="text-marketing-subtlest font-mono text-[10px]">
+          template
+        </span>
+      </div>
+      <div className="border-marketing-divider flex items-center justify-between rounded-md border px-3 py-2.5">
+        <span className="text-marketing-subtle font-mono text-[11px]">
+          {'{{name}}'}
+        </span>
+        <span className="text-marketing-subtlest font-mono text-[10px]">
+          variable
+        </span>
+      </div>
+    </div>
+  );
+}
+
+function AutomationsVisual() {
+  return (
+    <div
+      aria-hidden
+      className="border-marketing-divider bg-marketing-surface-base flex min-h-42 flex-col items-center justify-center gap-2 rounded-md border p-4"
+    >
+      <div className="border-marketing-divider bg-marketing-surface-raised w-full max-w-70 rounded-md border px-3 py-2.5 font-mono text-[11px]">
+        <span className="text-electric-blue">event</span>
+        <span className="text-marketing-subtle">: user.created</span>
+      </div>
+      <span className="text-marketing-subtlest text-[12px]" aria-hidden>
+        ↓
+      </span>
+      <div className="border-accent/50 bg-accent/10 w-full max-w-70 rounded-md border px-3 py-2.5 font-mono text-[11px]">
+        <span className="text-electric-blue">send_email</span>
+        <span className="text-marketing-subtle">: welcome</span>
+      </div>
+    </div>
+  );
+}
+
 const VISUALS = {
   api: ApiVisual,
+  automations: AutomationsVisual,
   dashboard: DashboardVisual,
   keys: KeysVisual,
   logs: LogsVisual,
+  templates: TemplatesVisual,
   worker: WorkerVisual,
 } as const;
 
@@ -162,7 +212,11 @@ export function HomeFeatures() {
         <div className="mt-14 grid grid-cols-1 gap-4 lg:grid-cols-6">
           {gridItems.map((item, index) => {
             const Visual = VISUALS[item.id as keyof typeof VISUALS];
-            const wide = item.id === 'worker' || item.id === 'api';
+            const wide =
+              item.id === 'worker' ||
+              item.id === 'api' ||
+              item.id === 'templates' ||
+              item.id === 'automations';
 
             return (
               <Reveal

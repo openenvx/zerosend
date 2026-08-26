@@ -82,7 +82,7 @@ function DomainsPage() {
       onSuccess: (result) => {
         queryClient.invalidateQueries({ queryKey: orpc.domains.list.key() });
         toast.success(
-          result.verified ? 'Domain verified' : 'Still pending — check DNS'
+          result.verified ? 'Domain verified' : 'Still pending - check DNS'
         );
       },
     })

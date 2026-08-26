@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { createFileRoute } from '@tanstack/react-router';
+import { createFileRoute, getRouteApi } from '@tanstack/react-router';
 import { Button } from '@zerosend/ui/components/button';
 import {
   Dialog,
@@ -20,13 +20,20 @@ import { toast } from 'sonner';
 
 import { orpc } from '@/utils/orpc';
 
+const authedRoute = getRouteApi('/_authed');
+
 export const Route = createFileRoute('/_authed/settings')({
   component: SettingsPage,
 });
 
 function SettingsPage() {
   const queryClient = useQueryClient();
-  const keysQuery = useQuery(orpc.keys.list.queryOptions());
+  const { currentProject } = authedRoute.useLoaderData();
+  const projectId = currentProject.id;
+
+  const keysQuery = useQuery(
+    orpc.keys.list.queryOptions({ input: { projectId } })
+  );
   const settingsQuery = useQuery(orpc.settings.get.queryOptions());
 
   const [createOpen, setCreateOpen] = useState(false);
@@ -143,7 +150,7 @@ function SettingsPage() {
           <div>
             <h2 className="text-card-title text-foreground">API keys</h2>
             <p className="text-body text-muted-foreground">
-              Bearer keys for `POST /v1/*` from your other projects.
+              Bearer keys for `POST /v1/*` scoped to {currentProject.name}.
             </p>
           </div>
           <Button
@@ -279,6 +286,7 @@ function SettingsPage() {
                   event.preventDefault();
                   createKey.mutate({
                     name: keyName.trim(),
+                    projectId,
                     type: keyType,
                   });
                 }}
@@ -352,7 +360,7 @@ function SettingsPage() {
               disabled={revokeKey.isPending}
               onClick={() => {
                 if (revokeId) {
-                  revokeKey.mutate({ id: revokeId });
+                  revokeKey.mutate({ id: revokeId, projectId });
                 }
               }}
               type="button"

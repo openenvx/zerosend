@@ -24,11 +24,14 @@ vi.mock('../send/send-email', async (importOriginal) => {
   };
 });
 
+const TEST_PROJECT_ID = '00000000-0000-4000-8000-000000000001';
+
 const testPrincipal: ApiKeyPrincipal = {
   id: 'key-1',
   keyPrefix: 'zs_test_abcd1234',
   keyType: 'test',
   kind: 'api_key',
+  projectId: TEST_PROJECT_ID,
   scopes: ['send'],
 };
 
@@ -155,6 +158,7 @@ describe('v1 OpenAPI handler', () => {
       id: testPrincipal.id,
       keyType: testPrincipal.keyType,
       kind: testPrincipal.kind,
+      projectId: testPrincipal.projectId,
       scopes: testPrincipal.scopes,
     });
   });

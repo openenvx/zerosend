@@ -12,6 +12,7 @@ export interface ApiKeyPrincipal {
   keyPrefix: string;
   keyType: ApiKeyType;
   kind: 'api_key';
+  projectId: string;
   scopes: string[];
 }
 

@@ -2,7 +2,6 @@ import { ORPCError } from '@orpc/server';
 import { z } from 'zod';
 
 import type { ApiKeyPrincipal } from '../../auth/types';
-import type { SendEmailBinding } from '../../send/email-binding';
 import {
   completeIdempotency,
   hashSendRequestBody,
@@ -168,6 +167,7 @@ export const v1Router = {
         id: principal.id,
         keyType: principal.keyType,
         kind: principal.kind,
+        projectId: principal.projectId,
         scopes: principal.scopes,
       };
     }),
@@ -248,6 +248,7 @@ export const v1Router = {
             keyId: principal.id,
             keyPrefix: principal.keyPrefix,
             keyType: principal.keyType,
+            projectId: principal.projectId,
           },
           { emailBinding: context.emailBinding }
         );

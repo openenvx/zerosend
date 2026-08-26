@@ -118,7 +118,7 @@ Create API keys in the dashboard **Settings** page after signing in at `$ZEROSEN
 Before live sends work:
 
 1. **Workers paid plan** - Email Sending requires a paid Workers plan.
-2. **Onboard a domain in the dashboard** - **Domains** → Add domain (requires `CF_API_TOKEN`). Copy DNS records, then **Verify**. Live sends require a verified row in zerosend D1 — `wrangler email sending enable` alone does not satisfy the gate.
+2. **Onboard a domain in the dashboard** - **Domains** → Add domain (requires `CF_API_TOKEN`). Copy DNS records, then **Verify**. Live sends require a verified row in zerosend D1 - `wrangler email sending enable` alone does not satisfy the gate.
 3. **Default from** - In **Settings**, set the default from address to a **verified** domain (used when API calls omit `from`).
 4. **Deploy** - The Worker includes a `send_email` binding named `EMAIL` in `wrangler.jsonc`.
 

@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { Link, createFileRoute } from '@tanstack/react-router';
+import { Link, createFileRoute, getRouteApi } from '@tanstack/react-router';
 import { Button } from '@zerosend/ui/components/button';
 import { EmptyState } from '@zerosend/ui/components/empty-state';
 import { PageHeader } from '@zerosend/ui/components/page-header';
@@ -13,6 +13,7 @@ import { SendTestEmailDialog } from '@/components/mailbox/send-test-email-dialog
 import { orpc } from '@/utils/orpc';
 
 const MAILBOX_LIST_LIMIT = 100;
+const authedRoute = getRouteApi('/_authed');
 
 export const Route = createFileRoute('/_authed/mailbox')({
   component: MailboxPage,
@@ -20,14 +21,22 @@ export const Route = createFileRoute('/_authed/mailbox')({
 
 function MailboxPage() {
   const queryClient = useQueryClient();
+  const { currentProject } = authedRoute.useLoaderData();
+  const projectId = currentProject.id;
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [sendOpen, setSendOpen] = useState(false);
 
-  const mailboxQuery = useQuery(orpc.mailbox.list.queryOptions());
-  const keysQuery = useQuery(orpc.keys.list.queryOptions());
+  const mailboxQuery = useQuery(
+    orpc.mailbox.list.queryOptions({ input: { projectId } })
+  );
+  const keysQuery = useQuery(
+    orpc.keys.list.queryOptions({ input: { projectId } })
+  );
   const settingsQuery = useQuery(orpc.settings.get.queryOptions());
   const detailQuery = useQuery({
-    ...orpc.mailbox.get.queryOptions({ input: { id: selectedId ?? '' } }),
+    ...orpc.mailbox.get.queryOptions({
+      input: { id: selectedId ?? '', projectId },
+    }),
     enabled: selectedId !== null,
   });
 
@@ -111,7 +120,7 @@ function MailboxPage() {
         defaultFrom={settingsQuery.data?.defaultFrom ?? ''}
         isPending={sendTest.isPending}
         onOpenChange={setSendOpen}
-        onSend={(input) => sendTest.mutate(input)}
+        onSend={(input) => sendTest.mutate({ ...input, projectId })}
         open={sendOpen}
         testKeys={testKeys}
       />

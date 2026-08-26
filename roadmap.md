@@ -197,11 +197,11 @@ EmailFlare’s test keys / in-house mailbox: [emailflare.dev](https://www.emailf
 
 **You can:** keep openenvx-cloud and another product from sharing a template or automation list, without a second Worker.
 
-- [ ] `projects` table; seed a **default** project and attach keys created in Phases 0–4
-- [ ] Rail switcher - still one `ADMIN_TOKEN`, no members
-- [ ] Keys belong to a project. That key can only use that project’s templates and fire that project’s automations
+- [x] `projects` table; seed a **default** project and attach keys created in Phases 0–4
+- [x] Rail switcher - still one `ADMIN_TOKEN`, no members
+- [x] Keys belong to a project. That key can only use that project’s templates and fire that project’s automations
 - [ ] `/templates` and `/automations` are the current project. `/domains` stays instance-wide
-- [ ] Logs and mailbox filter to the current project
+- [x] Logs and mailbox filter to the current project
 
 **Does not include:** the template editor (Phase 6), automations, users on a project.
 

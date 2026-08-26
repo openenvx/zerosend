@@ -41,6 +41,7 @@ export class ApiKeyAdapter implements AuthAdapter {
       keyPrefix: row.prefix,
       keyType: dbKeyType,
       kind: 'api_key',
+      projectId: row.projectId,
       scopes: JSON.parse(row.scopes) as string[],
     };
 

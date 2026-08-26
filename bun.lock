@@ -89,6 +89,7 @@
     "packages/api": {
       "name": "@zerosend/api",
       "dependencies": {
+        "@orpc/client": "catalog:",
         "@orpc/openapi": "catalog:",
         "@orpc/server": "catalog:",
         "@zerosend/db": "workspace:*",

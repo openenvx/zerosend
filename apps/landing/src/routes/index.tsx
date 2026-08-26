@@ -1,6 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router';
 
 import { Footer } from '@/components/footer';
+import { HomeAgentSkill } from '@/components/home/home-agent-skill';
 import { HomeApi } from '@/components/home/home-api';
 import { HomeFaq } from '@/components/home/home-faq';
 import { HomeFeatures } from '@/components/home/home-features';
@@ -25,6 +26,7 @@ function LandingPage() {
         <HomeFeatures />
         <HomeApi />
         <HomePipeline />
+        <HomeAgentSkill />
         <HomeFaq />
         <HomeFinalCta />
       </main>

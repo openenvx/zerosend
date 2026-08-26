@@ -33,6 +33,7 @@ export async function storeLiveEmailLog(
     htmlBody: null,
     id,
     isTest: 0,
+    projectId: params.keyContext.projectId,
     status: params.status,
     subject: params.input.subject,
     textBody: null,

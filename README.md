@@ -28,7 +28,7 @@ bun run setup && bun run migrate && bun run dev
 - **Product:** http://localhost:3001 (`bun run dev`)
 - **Landing + docs:** http://localhost:3000 (`bun run dev:landing` or `bun run dev:all`)
 
-Sign in at `/login` with your `ADMIN_TOKEN`, then create API keys in **Settings**.
+Sign in at `/login` with your `ADMIN_TOKEN`, then create API keys in **Settings**. Use the sidebar project switcher to namespace keys, logs, and mailbox per product. **Domains** and the default from address stay instance-wide.
 
 ## Quick start (Cloudflare)
 
@@ -107,7 +107,7 @@ curl -sS "$ZEROSEND_URL/v1/emails" \
   }'
 ```
 
-Responses include `X-RateLimit-Limit`, `X-RateLimit-Remaining`, and `X-RateLimit-Reset` (unix seconds). Repeat a send safely with `Idempotency-Key: your-key-here` — the same body returns the stored result.
+Responses include `X-RateLimit-Limit`, `X-RateLimit-Remaining`, and `X-RateLimit-Reset` (unix seconds). Repeat a send safely with `Idempotency-Key: your-key-here` - the same body returns the stored result.
 
 Sign in to the dashboard and open **Mailbox** to preview test sends. Use a `zs_live_` key for real delivery once your sending domain is onboarded to Cloudflare Email Sending.
 
@@ -115,7 +115,7 @@ Sign in to the dashboard and open **Mailbox** to preview test sends. Use a `zs_l
 
 1. Open **Domains** in the dashboard and add a sending domain on this Cloudflare account (`CF_API_TOKEN` required). Copy DNS records, then **Verify**.
 2. Set **Settings → Default from address** to an address on that verified domain (used when `from` is omitted).
-3. Create a **live** API key for each product project and send:
+3. Create a **live** API key per zerosend project (sidebar switcher) and send:
 
 ```bash
 export ZEROSEND_API_KEY=zs_live_…

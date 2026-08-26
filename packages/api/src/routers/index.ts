@@ -5,6 +5,7 @@ import { domainsRouter } from './domains';
 import { keysRouter } from './keys';
 import { logsRouter } from './logs';
 import { mailboxRouter } from './mailbox';
+import { projectsRouter } from './projects';
 import { settingsRouter } from './settings';
 
 export const appRouter = {
@@ -13,6 +14,7 @@ export const appRouter = {
   keys: keysRouter,
   logs: logsRouter,
   mailbox: mailboxRouter,
+  projects: projectsRouter,
   settings: settingsRouter,
 };
 

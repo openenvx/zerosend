@@ -11,6 +11,8 @@ import { sendEmail } from './send-email';
 import { normalizeRecipients, sendEmailInputSchema } from './send-email-input';
 import { storeTestEmail } from './store-test-email';
 
+const TEST_PROJECT_ID = '00000000-0000-4000-8000-000000000001';
+
 function createMockDb(options: {
   defaultFrom?: string | null;
   domainRows?: {
@@ -214,6 +216,7 @@ describe('sendEmail live path', () => {
         keyId: 'key-id',
         keyPrefix: 'zs_live_abc',
         keyType: 'live',
+        projectId: TEST_PROJECT_ID,
       },
       { emailBinding }
     );
@@ -256,6 +259,7 @@ describe('sendEmail live path', () => {
         keyId: 'key-id',
         keyPrefix: 'zs_live_abc',
         keyType: 'live',
+        projectId: TEST_PROJECT_ID,
       },
       { emailBinding }
     );
@@ -286,6 +290,7 @@ describe('sendEmail live path', () => {
         keyId: 'key-id',
         keyPrefix: 'zs_live_abc',
         keyType: 'live',
+        projectId: TEST_PROJECT_ID,
       },
       { emailBinding }
     );
@@ -315,6 +320,7 @@ describe('sendEmail live path', () => {
           keyId: 'key-id',
           keyPrefix: 'zs_live_abc',
           keyType: 'live',
+          projectId: TEST_PROJECT_ID,
         },
         { emailBinding }
       )
@@ -349,6 +355,7 @@ describe('sendEmail live path', () => {
           keyId: 'key-id',
           keyPrefix: 'zs_live_abc',
           keyType: 'live',
+          projectId: TEST_PROJECT_ID,
         },
         { emailBinding }
       )
@@ -378,6 +385,7 @@ describe('sendEmail live path', () => {
           keyId: 'key-id',
           keyPrefix: 'zs_live_abc',
           keyType: 'live',
+          projectId: TEST_PROJECT_ID,
         },
         { emailBinding }
       )
@@ -415,6 +423,7 @@ describe('sendEmail test path', () => {
           keyId: 'key-id',
           keyPrefix: 'zs_test_abc',
           keyType: 'test',
+          projectId: TEST_PROJECT_ID,
         },
         { emailBinding }
       )
@@ -444,6 +453,7 @@ describe('sendEmail test path', () => {
         keyId: 'key-id',
         keyPrefix: 'zs_test_abc',
         keyType: 'test',
+        projectId: TEST_PROJECT_ID,
       },
       { emailBinding }
     );
@@ -474,6 +484,7 @@ describe('sendEmail test path', () => {
         keyId: 'key-123',
         keyPrefix: 'zs_test_abc',
         keyType: 'test',
+        projectId: TEST_PROJECT_ID,
       }
     );
 
@@ -521,6 +532,7 @@ describe('storeTestEmail', () => {
         keyId: 'key-123',
         keyPrefix: 'zs_test_abc',
         keyType: 'test',
+        projectId: TEST_PROJECT_ID,
       }
     );
 
@@ -532,6 +544,7 @@ describe('storeTestEmail', () => {
       fromAddress: 'hello@example.com',
       htmlBody: '<p>Hi</p>',
       isTest: 1,
+      projectId: TEST_PROJECT_ID,
       status: 'sent',
       subject: 'Hello',
       textBody: null,

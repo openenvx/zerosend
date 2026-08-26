@@ -17,6 +17,7 @@
     "check-types": "tsc --noEmit"
   },
   "dependencies": {
+    "@orpc/client": "catalog:",
     "@orpc/openapi": "catalog:",
     "@orpc/server": "catalog:",
     "@zerosend/db": "workspace:*",

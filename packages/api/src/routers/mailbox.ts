@@ -10,12 +10,23 @@ import { sendEmail, sendEmailInputSchema } from '../send/send-email';
 
 export const mailboxRouter = {
   get: adminProcedure
-    .input(z.object({ id: z.string().uuid() }))
+    .input(
+      z.object({
+        id: z.string().uuid(),
+        projectId: z.string().uuid(),
+      })
+    )
     .handler(async ({ context, input }) => {
       const [row] = await context.db
         .select()
         .from(emailLogs)
-        .where(and(eq(emailLogs.id, input.id), eq(emailLogs.isTest, 1)))
+        .where(
+          and(
+            eq(emailLogs.id, input.id),
+            eq(emailLogs.projectId, input.projectId),
+            eq(emailLogs.isTest, 1)
+          )
+        )
         .limit(1);
 
       if (!row) {
@@ -36,32 +47,38 @@ export const mailboxRouter = {
       };
     }),
 
-  list: adminProcedure.handler(async ({ context }) =>
-    listEmailLogs(context.db, {
-      limit: MAILBOX_LIST_LIMIT,
-      testOnly: true,
-    })
-  ),
+  list: adminProcedure
+    .input(z.object({ projectId: z.string().uuid() }))
+    .handler(async ({ context, input }) =>
+      listEmailLogs(context.db, {
+        limit: MAILBOX_LIST_LIMIT,
+        projectId: input.projectId,
+        testOnly: true,
+      })
+    ),
 
   send: adminProcedure
     .input(
       sendEmailInputSchema.extend({
         keyId: z.string().uuid(),
+        projectId: z.string().uuid(),
       })
     )
     .handler(async ({ context, input }) => {
-      const { keyId, ...emailInput } = input;
+      const { keyId, projectId, ...emailInput } = input;
 
       const [key] = await context.db
         .select({
           id: apiKeys.id,
           keyType: apiKeys.keyType,
           prefix: apiKeys.prefix,
+          projectId: apiKeys.projectId,
         })
         .from(apiKeys)
         .where(
           and(
             eq(apiKeys.id, keyId),
+            eq(apiKeys.projectId, projectId),
             eq(apiKeys.keyType, 'test'),
             isNull(apiKeys.revokedAt)
           )
@@ -85,6 +102,7 @@ export const mailboxRouter = {
         keyId: key.id,
         keyPrefix: key.prefix,
         keyType,
+        projectId: key.projectId,
       });
     }),
 };

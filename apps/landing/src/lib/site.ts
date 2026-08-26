@@ -10,5 +10,6 @@ export const SITE = {
 export const NAV_LINKS = [
   { href: '/#features', label: 'Features' },
   { href: '/#api', label: 'API' },
+  { href: '/#agent-skill', label: 'Agents' },
   { href: '/docs', label: 'Docs' },
 ] as const;

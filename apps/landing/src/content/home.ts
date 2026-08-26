@@ -55,10 +55,10 @@ export const HOME = {
     title: 'Questions, answered.',
   },
   features: {
-    body: 'Dashboard, REST, keys, and logs - the sending layer every product needs and nobody wants to rebuild.',
+    body: 'Send transactional email today, then build on the same foundation with visual templates and event-driven automations. One self-hosted Cloudflare app for your products, keys, domains, and delivery logs.',
     items: [
       {
-        body: 'Operator UI, /v1 REST, and queue handlers share a single Cloudflare Worker. One deploy, one wrangler file.',
+        body: 'Dashboard and /v1 REST share a single Cloudflare Worker. One deploy, one wrangler file, and a foundation ready for background delivery.',
         id: 'worker',
         title: 'One Worker',
       },
@@ -83,13 +83,45 @@ export const HOME = {
         title: 'Logs you can read',
       },
       {
+        body: 'Coming next: design reusable email templates in OpenEnvX, publish them, and send with variables from any product.',
+        id: 'templates',
+        title: 'Reusable templates',
+      },
+      {
+        body: 'Coming next: trigger emails from product events, then add delays and event waits as workflows evolve.',
+        id: 'automations',
+        title: 'Event-driven automations',
+      },
+      {
         body: 'Clone, set ADMIN_TOKEN and SESSION_SECRET, migrate D1, deploy. Sensible defaults - no control plane to rent.',
         id: 'deploy',
-        title: 'Deploy on Cloudflare',
+        title: 'Self-host on Cloudflare',
       },
     ],
     label: 'Why Zerosend',
-    title: 'The sending layer, already built.',
+    title: 'From first send to automated delivery.',
+  },
+  agentSkill: {
+    description:
+      'Beyond API docs, the Zerosend Agent Skill teaches coding agents how to authenticate, test sends safely, scope projects, retry requests, and deploy-so they write correct integrations instead of guessing.',
+    file: 'skills/zerosend/SKILL.md',
+    installCommand: 'npx skills add openenvx/zerosend',
+    label: 'Agent skill',
+    points: [
+      'Install with npx skills add openenvx/zerosend',
+      'Works with coding agents that support the open Agent Skills format',
+      'Tests first; live delivery requires explicit approval',
+      'Read the source on GitHub before installing',
+    ],
+    preview: [
+      'Separate admin and API-key auth',
+      'Test keys stay in the mailbox',
+      'Idempotency keys make retries safe',
+      'Project-scoped keys and verified domains',
+    ],
+    titleLead: 'A skill your agent loads to use Zerosend correctly.',
+    href: 'https://github.com/openenvx/zerosend/tree/main/skills/zerosend',
+    linkLabel: 'Browse the agent skill',
   },
   hero: {
     headline: 'Send email from your stack without another SaaS bill.',
@@ -99,10 +131,10 @@ export const HOME = {
     support: {
       after: '.',
       before: 'Zerosend is a ',
-      emphasisA: 'single Cloudflare Worker',
-      emphasisB: 'keys you control',
+      emphasisA: 'self-hosted email platform',
+      emphasisB: 'API keys you control',
       middle:
-        ': operator dashboard, REST API, and docs. Your products call it like Resend - with ',
+        ' for your Cloudflare stack. Send email today, then add reusable templates and event-driven automations as your products grow-with ',
     },
     tertiaryHref: '/docs/getting-started',
   },
@@ -132,7 +164,7 @@ export const HOME = {
     title: 'A send is a request. The rest is infrastructure.',
   },
   playground: {
-    body: 'One POST is a working send. Keys, templates, and automations are files you add as the product grows - nothing to register with a hosted vendor.',
+    body: 'One POST is a working send. Plain HTTP, OpenAPI-backed endpoints, copyable curl, and an llms.txt index make the API easy to use from your app, scripts, or coding agents.',
     files: [
       {
         hint: 'A Bearer key and a JSON body are a complete send. Point ZEROSEND_URL at your Worker.',

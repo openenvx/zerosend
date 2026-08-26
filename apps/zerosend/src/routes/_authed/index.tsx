@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { Link, createFileRoute } from '@tanstack/react-router';
+import { Link, createFileRoute, getRouteApi } from '@tanstack/react-router';
 import { EmptyState } from '@zerosend/ui/components/empty-state';
 import { Check, ChevronRight, KeyRound, Mail, ScrollText } from 'lucide-react';
 
@@ -7,14 +7,22 @@ import { EmailLogRow } from '@/components/email-log-row';
 import { orpc } from '@/utils/orpc';
 
 const LOGS_LIST_LIMIT = 50;
+const authedRoute = getRouteApi('/_authed');
 
 export const Route = createFileRoute('/_authed/')({
   component: HomePage,
 });
 
 function HomePage() {
-  const keysQuery = useQuery(orpc.keys.list.queryOptions());
-  const logsQuery = useQuery(orpc.logs.list.queryOptions());
+  const { currentProject } = authedRoute.useLoaderData();
+  const projectId = currentProject.id;
+
+  const keysQuery = useQuery(
+    orpc.keys.list.queryOptions({ input: { projectId } })
+  );
+  const logsQuery = useQuery(
+    orpc.logs.list.queryOptions({ input: { projectId } })
+  );
 
   const activeKeyCount =
     keysQuery.data?.filter((key) => key.active).length ?? 0;

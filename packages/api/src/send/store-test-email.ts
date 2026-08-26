@@ -9,6 +9,7 @@ export interface SendEmailKeyContext {
   keyId: string;
   keyPrefix: string;
   keyType: ApiKeyType;
+  projectId: string;
 }
 
 type Db = ReturnType<typeof createDb>;
@@ -30,6 +31,7 @@ export async function storeTestEmail(
     htmlBody: input.html ?? null,
     id,
     isTest: 1,
+    projectId: keyContext.projectId,
     status: 'sent',
     subject: input.subject,
     textBody: input.text ?? null,

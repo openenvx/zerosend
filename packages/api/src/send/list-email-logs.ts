@@ -1,6 +1,6 @@
 import type { createDb } from '@zerosend/db';
 import { emailLogs } from '@zerosend/db/schema';
-import { desc, eq } from 'drizzle-orm';
+import { and, desc, eq } from 'drizzle-orm';
 
 type Db = ReturnType<typeof createDb>;
 
@@ -8,6 +8,7 @@ export const LOGS_LIST_LIMIT = 50;
 export const MAILBOX_LIST_LIMIT = 100;
 
 export interface ListEmailLogsOptions {
+  projectId: string;
   testOnly?: boolean;
   limit?: number;
 }
@@ -25,18 +26,20 @@ const listFields = {
   toAddress: emailLogs.toAddress,
 };
 
-export async function listEmailLogs(
-  db: Db,
-  options: ListEmailLogsOptions = {}
-) {
+export async function listEmailLogs(db: Db, options: ListEmailLogsOptions) {
   const limit = options.limit ?? LOGS_LIST_LIMIT;
 
-  const baseQuery = db.select(listFields).from(emailLogs);
-  const filtered = options.testOnly
-    ? baseQuery.where(eq(emailLogs.isTest, 1))
-    : baseQuery;
+  const conditions = [eq(emailLogs.projectId, options.projectId)];
+  if (options.testOnly) {
+    conditions.push(eq(emailLogs.isTest, 1));
+  }
 
-  const rows = await filtered.orderBy(desc(emailLogs.createdAt)).limit(limit);
+  const rows = await db
+    .select(listFields)
+    .from(emailLogs)
+    .where(and(...conditions))
+    .orderBy(desc(emailLogs.createdAt))
+    .limit(limit);
 
   return rows.map((row) => ({
     ...row,
