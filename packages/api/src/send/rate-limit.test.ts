@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 
 import {
   consumeApiKeyRateLimit,
@@ -42,7 +42,7 @@ describe('kv rate limiter', () => {
     expect(limited.remaining).toBe(0);
   });
 
-  it('expires KV entries at the window reset timestamp', async () => {
+  it('increments within a window that is about to reset', async () => {
     const kv = createMemoryKvNamespace();
     const apiKeyId = 'key-end-window';
     const windowStart = getRateLimitWindowStart(nowMs);
@@ -53,6 +53,20 @@ describe('kv rate limiter', () => {
 
     const peeked = await peekApiKeyRateLimit(kv, apiKeyId, nearEndMs);
     expect(peeked.remaining).toBe(SEND_RATE_LIMIT - 1);
+  });
+
+  it('uses a KV TTL of at least 60s even at the end of a window', async () => {
+    const kv = createMemoryKvNamespace();
+    const put = vi.spyOn(kv, 'put');
+    const windowStart = getRateLimitWindowStart(nowMs);
+    const lastMs = windowStart * 1000 + SEND_RATE_WINDOW_SECONDS * 1000 - 1;
+
+    await consumeApiKeyRateLimit(kv, 'key-ttl', lastMs);
+
+    expect(put).toHaveBeenCalledOnce();
+    const options = put.mock.calls[0]?.[2] as KVNamespacePutOptions | undefined;
+    expect(options?.expiration).toBeUndefined();
+    expect(options?.expirationTtl).toBeGreaterThanOrEqual(60);
   });
 
   it('peeks without incrementing', async () => {

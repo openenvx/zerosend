@@ -2,8 +2,10 @@ import {
   buildRateLimitState,
   getRateLimitWindowReset,
   getRateLimitWindowStart,
-  SEND_RATE_WINDOW_SECONDS,
 } from './rate-limit';
+
+/** KV rejects expiration targets less than 60 seconds into the future. */
+const KV_MIN_EXPIRATION_TTL_SECONDS = 60;
 
 function getRateLimitKvKey(apiKeyId: string, windowStart: number): string {
   return `rl:${apiKeyId}:${windowStart}`;
@@ -14,10 +16,15 @@ function getRateLimitKvPutOptions(
   reset: number
 ): KVNamespacePutOptions {
   const nowSeconds = Math.floor(nowMs / 1000);
-  // KV requires expiration at least 60s in the future (TTL or absolute).
-  const expiration = Math.max(reset, nowSeconds + SEND_RATE_WINDOW_SECONDS);
+  // Use relative TTL, not absolute `expiration`. `nowSeconds + 60` is often
+  // less than 60s in the future after flooring and KV clock skew, which KV
+  // rejects with 400.
+  const expirationTtl = Math.max(
+    KV_MIN_EXPIRATION_TTL_SECONDS,
+    reset - nowSeconds
+  );
 
-  return { expiration };
+  return { expirationTtl };
 }
 
 function parseCount(value: string | null): number {

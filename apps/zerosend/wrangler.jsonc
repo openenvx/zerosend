@@ -9,7 +9,7 @@
     "enabled": true,
   },
   // Omit database_id for one-click deploy; Cloudflare provisions D1 per account.
-  // After first deploy, copy the ID from the dashboard only if you need local `db:migrate:remote`.
+  // Remote migrations resolve the ID via `wrangler d1 list` (see scripts/d1-migrate-remote.ts).
   "d1_databases": [
     {
       "binding": "DB",

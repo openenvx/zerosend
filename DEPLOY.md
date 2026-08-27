@@ -40,7 +40,7 @@ If you need to apply migrations outside the deploy script (e.g. after pulling sc
 bun run db:migrate:remote
 ```
 
-If migration commands fail with “database not found”, copy the D1 database ID from **Workers & Pages → zerosend → Settings → Bindings → DB** into the root `wrangler.jsonc` **locally only** - do not commit account-specific IDs to a public template.
+`db:migrate:remote` looks up the `zerosend` D1 database with `wrangler d1 list` so you do not put `database_id` in git. You must be logged in (`bunx wrangler login` or `CLOUDFLARE_API_TOKEN`).
 
 ## Prerequisites (manual deploy)
 
@@ -195,7 +195,7 @@ Set `ZEROSEND_URL=https://zerosend.yourdomain.com` in product apps that send mai
 
 **D1 error 7404: database could not be found** - remove any committed `database_id` from `wrangler.jsonc`. D1 IDs are account-specific; the template uses `database_name` only so Cloudflare can provision per account.
 
-**`missing a database_id` on first deploy** - remote migrations use the root `wrangler.jsonc`, which the Deploy button patches with the provisioned D1 id. The app config omits `database_id` on purpose so each account gets its own database.
+**`missing a database_id` on remote migrations** - do not add an ID to `wrangler.jsonc`. `bun run db:migrate:remote` resolves it from Cloudflare by database name. If lookup fails, run `bunx wrangler whoami` and `bunx wrangler d1 list`.
 
 **Deploy button fails with `CLOUDFLARE_API_TOKEN`** - Workers Builds injects this token for Wrangler. Turbo must pass it through (`globalPassThroughEnv` in `turbo.json`). If you still see the error, open the Worker → **Settings → Builds → API token** and create/select a token, then retry.
 

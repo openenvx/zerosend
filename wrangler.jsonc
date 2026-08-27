@@ -9,7 +9,7 @@
     "enabled": true,
   },
   // Used by the Deploy to Cloudflare button to auto-provision D1. Production deploy runs from apps/zerosend (see root package.json "deploy").
-  // Omit database_id so each account gets its own database. Do not commit account-specific IDs to a public template.
+  // Omit database_id so each account gets its own database. Remote migrations look it up with wrangler d1 list.
   "d1_databases": [
     {
       "binding": "DB",
