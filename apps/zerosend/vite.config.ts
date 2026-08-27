@@ -1,3 +1,5 @@
+import { fileURLToPath } from 'node:url';
+
 import { cloudflare } from '@cloudflare/vite-plugin';
 import tailwindcss from '@tailwindcss/vite';
 import { tanstackStart } from '@tanstack/react-start/plugin/vite';
@@ -12,6 +14,11 @@ export default defineConfig({
     viteReact(),
   ],
   resolve: {
+    // Explicit alias: Vite's built-in tsconfigPaths can miss @/ during dependency
+    // pre-bundling when TanStack Router uses virtual module IDs (see vite#21889).
+    alias: {
+      '@': fileURLToPath(new URL('src', import.meta.url)),
+    },
     tsconfigPaths: true,
   },
   server: {

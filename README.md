@@ -28,7 +28,7 @@ bun run setup && bun run migrate && bun run dev
 - **Product:** http://localhost:3001 (`bun run dev`)
 - **Landing + docs:** http://localhost:3000 (`bun run dev:landing` or `bun run dev:all`)
 
-Sign in at `/login` with your `ADMIN_TOKEN`, then create API keys in **Settings**. Use the sidebar project switcher to namespace keys, logs, and mailbox per product. **Domains** and the default from address stay instance-wide.
+Sign in at `/login` with your `ADMIN_TOKEN`, then create API keys in **Settings**. Use the sidebar project switcher to namespace keys, logs, mailbox, and templates per product. **Domains** and the default from address stay instance-wide.
 
 ## Quick start (Cloudflare)
 
@@ -131,6 +131,27 @@ curl -sS "$ZEROSEND_URL/v1/emails" \
 ```
 
 Local `wrangler dev` simulates the `EMAIL` binding by default. Add `"remote": true` to the `send_email` binding in `apps/zerosend/wrangler.jsonc` when you want real sends from your laptop.
+
+### Templates
+
+Design templates in the dashboard under **Templates** (OpenEnvx visual editor via `@openenvx/email`). **Publish** stores HTML/text snapshots. Send from another project with the template id for the current zerosend project:
+
+```bash
+curl -sS "$ZEROSEND_URL/v1/emails" \
+  -H "Authorization: Bearer $ZEROSEND_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "from": "hello@example.com",
+    "to": "user@example.com",
+    "subject": "Welcome {{{name}}}",
+    "template": {
+      "id": "00000000-0000-4000-8000-000000000010",
+      "variables": { "name": "Ada" }
+    }
+  }'
+```
+
+Use `zs_test_` keys to preview in **Mailbox** before live delivery. Subject and published snapshots support `{{{variable}}}` tokens; zerosend interpolates them at send time.
 
 ## Scripts
 

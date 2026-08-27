@@ -1,5 +1,5 @@
 import { Link } from '@tanstack/react-router';
-import { sendEmailInputSchema } from '@zerosend/api/send/send-email';
+import { sendEmailInputSchema } from '@zerosend/api/send/send-email-input';
 import { Button } from '@zerosend/ui/components/button';
 import {
   Dialog,
@@ -90,7 +90,7 @@ export function SendTestEmailDialog({
               Create a test API key in Settings before sending.
             </p>
             <DialogFooter className="shrink-0">
-              <Button render={<Link to="/settings" />} type="button">
+              <Button nativeButton={false} render={<Link to="/settings" />}>
                 Go to Settings
               </Button>
             </DialogFooter>

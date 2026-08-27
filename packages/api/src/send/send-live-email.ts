@@ -8,7 +8,7 @@ import {
   mapCloudflareEmailError,
 } from './map-cloudflare-email-error';
 import { resolveFromAddress } from './resolve-from-address';
-import type { SendEmailInput } from './send-email-input';
+import type { ResolvedSendEmailInput } from './send-email-input';
 import { storeLiveEmailLog } from './store-live-email';
 import type { SendEmailKeyContext } from './store-test-email';
 
@@ -16,7 +16,7 @@ type Db = ReturnType<typeof createDb>;
 
 export async function sendLiveEmail(
   db: Db,
-  input: SendEmailInput,
+  input: ResolvedSendEmailInput,
   keyContext: SendEmailKeyContext,
   emailBinding: SendEmailBinding
 ): Promise<{ id: string }> {

@@ -92,7 +92,7 @@ function MailboxPage() {
                 Send test email
               </Button>
             ) : (
-              <Button render={<Link to="/settings" />} type="button">
+              <Button nativeButton={false} render={<Link to="/settings" />}>
                 Create a test key
               </Button>
             )

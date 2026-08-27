@@ -113,7 +113,7 @@ EmailFlare-small, one nav, no user/org settings:
 - [x] `/` - logs (empty until Phase 1; project-filtered from Phase 5)
 - [x] `/mailbox` - Phase 1 test inbox
 - [x] `/domains` - Phase 4 (instance-wide)
-- [ ] `/templates` - Phase 6 (current project)
+- [x] `/templates` - Phase 6 (current project)
 - [ ] `/automations` - Phase 7 list; Phase 8 canvas (current project)
 - [x] `/settings` - API keys + default from address (keys are per-project from Phase 5)
 
@@ -200,7 +200,7 @@ EmailFlare’s test keys / in-house mailbox: [emailflare.dev](https://www.emailf
 - [x] `projects` table; seed a **default** project and attach keys created in Phases 0–4
 - [x] Rail switcher - still one `ADMIN_TOKEN`, no members
 - [x] Keys belong to a project. That key can only use that project’s templates and fire that project’s automations
-- [ ] `/templates` and `/automations` are the current project. `/domains` stays instance-wide
+- [x] `/templates` and `/automations` are the current project. `/domains` stays instance-wide
 - [x] Logs and mailbox filter to the current project
 
 **Does not include:** the template editor (Phase 6), automations, users on a project.
@@ -213,12 +213,12 @@ EmailFlare’s test keys / in-house mailbox: [emailflare.dev](https://www.emailf
 
 EmailFlare’s “templates you manage, not code” - visual editor instead of React Email layouts.
 
-- [ ] Templates belong to the current project
-- [ ] `file:` to sibling `editor-core` `@openenvx/driver-email` (+ workbench, html, core). Not `DEFAULT_HTML_STUDIO_PLUGINS`
-- [ ] Client-only editor: `WorkbenchShell` + `EmailBlocksPlugin` (see `apps/email-demo` in editor-core)
-- [ ] Scene JSON is truth; publish snapshots HTML/text so send/queue never import OpenEnvX
-- [ ] `{{{VAR}}}` interpolation owned by zerosend
-- [ ] Preview rendered HTML in the dashboard before a live send
+- [x] Templates belong to the current project
+- [x] Published `@openenvx/email` in the dashboard (`EmailEditor` + `./runtime` + `./theme.css`)
+- [x] Client-only editor with debounced scene save and client-side publish snapshots
+- [x] Scene JSON is truth; publish snapshots HTML/text so send/queue never import OpenEnvx
+- [x] `{{{VAR}}}` interpolation owned by zerosend
+- [x] Preview rendered HTML in the dashboard before a live send
 
 **Does not include:** automations.
 

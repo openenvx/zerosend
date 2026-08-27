@@ -7,6 +7,7 @@ import { logsRouter } from './logs';
 import { mailboxRouter } from './mailbox';
 import { projectsRouter } from './projects';
 import { settingsRouter } from './settings';
+import { templatesRouter } from './templates';
 
 export const appRouter = {
   domains: domainsRouter,
@@ -16,6 +17,7 @@ export const appRouter = {
   mailbox: mailboxRouter,
   projects: projectsRouter,
   settings: settingsRouter,
+  templates: templatesRouter,
 };
 
 export type AppRouter = typeof appRouter;

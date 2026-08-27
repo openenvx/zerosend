@@ -1,14 +1,14 @@
 import type { createDb } from '@zerosend/db';
 import { emailLogs } from '@zerosend/db/schema';
 
-import type { SendEmailInput } from './send-email-input';
+import type { ResolvedSendEmailInput } from './send-email-input';
 import { formatToAddressForLog } from './send-email-input';
 import type { SendEmailKeyContext } from './store-test-email';
 
 type Db = ReturnType<typeof createDb>;
 
 interface StoreLiveEmailLogInput {
-  input: SendEmailInput;
+  input: ResolvedSendEmailInput;
   keyContext: SendEmailKeyContext;
   fromAddress: string;
   status: 'sent' | 'failed';
@@ -36,6 +36,7 @@ export async function storeLiveEmailLog(
     projectId: params.keyContext.projectId,
     status: params.status,
     subject: params.input.subject,
+    templateId: params.input.templateId ?? null,
     textBody: null,
     toAddress: formatToAddressForLog(params.input.to),
   });

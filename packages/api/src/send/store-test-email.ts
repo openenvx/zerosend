@@ -2,7 +2,7 @@ import type { createDb } from '@zerosend/db';
 import { emailLogs } from '@zerosend/db/schema';
 
 import type { ApiKeyType } from '../auth/types';
-import type { SendEmailInput } from './send-email-input';
+import type { ResolvedSendEmailInput } from './send-email-input';
 import { formatToAddressForLog } from './send-email-input';
 
 export interface SendEmailKeyContext {
@@ -16,7 +16,7 @@ type Db = ReturnType<typeof createDb>;
 
 export async function storeTestEmail(
   db: Db,
-  input: SendEmailInput & { from: string },
+  input: ResolvedSendEmailInput & { from: string },
   keyContext: SendEmailKeyContext
 ): Promise<{ id: string }> {
   const id = crypto.randomUUID();
@@ -34,6 +34,7 @@ export async function storeTestEmail(
     projectId: keyContext.projectId,
     status: 'sent',
     subject: input.subject,
+    templateId: input.templateId ?? null,
     textBody: input.text ?? null,
     toAddress: formatToAddressForLog(input.to),
   });

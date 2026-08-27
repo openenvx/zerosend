@@ -62,7 +62,6 @@ const primaryNavItems: NavItem[] = [
     to: '/domains',
   },
   {
-    disabled: true,
     icon: <FileText size={16} />,
     label: 'Templates',
     to: '/templates',

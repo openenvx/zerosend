@@ -16,6 +16,8 @@ import {
   sendEmail,
   SendEmailDeliveryError,
   sendEmailInputSchema,
+  TemplateNotFoundError,
+  TemplateNotPublishedError,
   UnverifiedFromDomainError,
   type SendEmailInput,
 } from '../../send/send-email';
@@ -78,6 +80,14 @@ function mapSendError(error: unknown): {
   }
 
   if (error instanceof UnverifiedFromDomainError) {
+    return { body: { error: error.message }, status: 400 };
+  }
+
+  if (error instanceof TemplateNotFoundError) {
+    return { body: { error: error.message }, status: 404 };
+  }
+
+  if (error instanceof TemplateNotPublishedError) {
     return { body: { error: error.message }, status: 400 };
   }
 

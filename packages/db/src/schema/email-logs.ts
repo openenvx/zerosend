@@ -17,6 +17,7 @@ export const emailLogs = sqliteTable('email_logs', {
     .references(() => projects.id),
   status: text('status').notNull().default('sent'),
   subject: text('subject').notNull(),
+  templateId: text('template_id'),
   textBody: text('text_body'),
   toAddress: text('to_address').notNull(),
 });

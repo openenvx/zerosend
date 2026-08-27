@@ -39,7 +39,9 @@ function HomePage() {
   return (
     <div className="space-y-8">
       <header className="space-y-1">
-        <p className="text-body text-muted-foreground">{today}</p>
+        <p className="text-body text-muted-foreground" suppressHydrationWarning>
+          {today}
+        </p>
         <h1 className="text-greeting text-foreground">Welcome back</h1>
       </header>
 

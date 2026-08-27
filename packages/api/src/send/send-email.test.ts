@@ -154,6 +154,33 @@ describe('sendEmailInputSchema', () => {
 
     expect(result.success).toBe(false);
   });
+
+  it('accepts template sends without html or text', () => {
+    const result = sendEmailInputSchema.safeParse({
+      subject: 'Hello {{{name}}}',
+      template: {
+        id: '00000000-0000-4000-8000-000000000010',
+        variables: { name: 'Ada' },
+      },
+      to: 'user@example.com',
+    });
+
+    expect(result.success).toBe(true);
+  });
+
+  it('rejects template and html together', () => {
+    const result = sendEmailInputSchema.safeParse({
+      html: '<p>Hello</p>',
+      subject: 'Hello',
+      template: {
+        id: '00000000-0000-4000-8000-000000000010',
+        variables: {},
+      },
+      to: 'user@example.com',
+    });
+
+    expect(result.success).toBe(false);
+  });
 });
 
 describe('normalizeRecipients', () => {

@@ -1,8 +1,8 @@
 import type { SendEmailMessage } from './email-binding';
-import type { SendEmailInput } from './send-email-input';
+import type { ResolvedSendEmailInput } from './send-email-input';
 
 export function buildSendEmailMessage(
-  input: SendEmailInput,
+  input: ResolvedSendEmailInput,
   fromAddress: string
 ): SendEmailMessage {
   const message: SendEmailMessage = {
