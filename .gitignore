@@ -36,8 +36,8 @@ local.db-*
 *~
 .DS_Store
 
-# Logs
-logs
+# Logs (root-only — a bare `logs` pattern also ignores src/components/logs)
+/logs
 .evlog/
 *.log
 npm-debug.log*

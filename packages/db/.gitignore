@@ -11,8 +11,8 @@ dist
 coverage
 *.lcov
 
-# logs
-logs
+# logs (package-root only — a bare `logs` pattern ignores any folder named logs)
+/logs
 _.log
 report.[0-9]_.[0-9]_.[0-9]_.[0-9]_.json
 
