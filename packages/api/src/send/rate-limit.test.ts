@@ -26,9 +26,10 @@ describe('rate limit windows', () => {
 });
 
 describe('kv rate limiter', () => {
+  const nowMs = Date.now();
+
   it('allows up to the configured limit', async () => {
     const kv = createMemoryKvNamespace();
-    const nowMs = 1_700_000_000_000;
     const apiKeyId = 'key-1';
 
     for (let index = 0; index < SEND_RATE_LIMIT; index += 1) {
@@ -41,9 +42,21 @@ describe('kv rate limiter', () => {
     expect(limited.remaining).toBe(0);
   });
 
+  it('expires KV entries at the window reset timestamp', async () => {
+    const kv = createMemoryKvNamespace();
+    const apiKeyId = 'key-end-window';
+    const windowStart = getRateLimitWindowStart(nowMs);
+    const nearEndMs =
+      windowStart * 1000 + (SEND_RATE_WINDOW_SECONDS - 21) * 1000;
+
+    await consumeApiKeyRateLimit(kv, apiKeyId, nearEndMs);
+
+    const peeked = await peekApiKeyRateLimit(kv, apiKeyId, nearEndMs);
+    expect(peeked.remaining).toBe(SEND_RATE_LIMIT - 1);
+  });
+
   it('peeks without incrementing', async () => {
     const kv = createMemoryKvNamespace();
-    const nowMs = 1_700_000_000_000;
     const apiKeyId = 'key-1';
 
     await consumeApiKeyRateLimit(kv, apiKeyId, nowMs);

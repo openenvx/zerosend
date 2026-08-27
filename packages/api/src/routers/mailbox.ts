@@ -67,6 +67,14 @@ export const mailboxRouter = {
     .handler(async ({ context, input }) => {
       const { keyId, projectId, ...emailInput } = input;
 
+      context.log.set({
+        mailbox: {
+          action: 'send_test',
+          keyId,
+          projectId,
+        },
+      });
+
       const [key] = await context.db
         .select({
           id: apiKeys.id,

@@ -6,7 +6,9 @@ Self-hosted email platform on Cloudflare Workers - dashboard, REST API, and D1. 
 
 **Full deploy guide:** [DEPLOY.md](./DEPLOY.md)
 
-## Quick start (local)
+## Development
+
+### Run locally
 
 Same flow as [Mailflare](https://github.com/hieunc229/mailflare):
 
@@ -30,7 +32,9 @@ bun run setup && bun run migrate && bun run dev
 
 Sign in at `/login` with your `ADMIN_TOKEN`, then create API keys in **Settings**. Use the sidebar project switcher to namespace keys, logs, mailbox, and templates per product. **Domains** and the default from address stay instance-wide.
 
-## Quick start (Cloudflare)
+## Usage
+
+### Deploy to Cloudflare
 
 ### One-click (recommended)
 
@@ -153,7 +157,7 @@ curl -sS "$ZEROSEND_URL/v1/emails" \
 
 Use `zs_test_` keys to preview in **Mailbox** before live delivery. Subject and published snapshots support `{{{variable}}}` tokens; zerosend interpolates them at send time.
 
-## Scripts
+## Development scripts
 
 | Command | Description |
 | --- | --- |
@@ -163,10 +167,16 @@ Use `zs_test_` keys to preview in **Mailbox** before live delivery. Subject and 
 | `bun run dev:all` | Product + landing in parallel |
 | `bun run migrate` | Apply D1 migrations locally (alias) |
 | `bun run db:migrate:local` | Apply D1 migrations to local D1 |
-| `bun run db:migrate:remote` | Apply D1 migrations to production D1 |
 | `bun run db:generate` | New Drizzle migration after schema edits |
-| `bun run deploy` | Build + migrate + deploy product Worker |
-| `bun run deploy:with-migrations` | Remote migrate + deploy |
-| `bun run deploy:landing` | Deploy landing Worker |
 | `bun run cf-typegen` | Regenerate Wrangler env types |
 | `bun run check` | Lint/format (Ultracite) |
+| `bun run fix` | Format and fix lint issues (Ultracite) |
+
+## Usage scripts
+
+| Command                          | Description                             |
+| -------------------------------- | --------------------------------------- |
+| `bun run deploy`                 | Build + migrate + deploy product Worker |
+| `bun run deploy:with-migrations` | Remote migrate + deploy                 |
+| `bun run deploy:landing`         | Deploy landing Worker                   |
+| `bun run db:migrate:remote`      | Apply D1 migrations to production D1    |

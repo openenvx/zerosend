@@ -13,6 +13,7 @@ import * as kvRateLimitModule from '../send/kv-rate-limiter';
 import { createMemoryKvNamespace } from '../send/kv-rate-limiter';
 import { getRateLimitWindowStart, SEND_RATE_LIMIT } from '../send/rate-limit';
 import { sendEmail } from '../send/send-email';
+import { SEND_EMAIL_TIMEOUT_MS } from '../send/with-timeout';
 import { createV1Context } from '../v1-context';
 import { createV1OpenAPIHandler } from './handler';
 
@@ -248,6 +249,32 @@ describe('v1 OpenAPI handler', () => {
     expect(await response.json()).toEqual({ id: 'log-123' });
     expect(response.headers.get('X-RateLimit-Limit')).toBe('100');
     expect(sendEmail).toHaveBeenCalledOnce();
+  });
+
+  it('returns 504 when email send exceeds the timeout', async () => {
+    vi.useFakeTimers();
+    vi.mocked(sendEmail).mockImplementation(() => new Promise(() => {}));
+
+    const responsePromise = handleV1(
+      new Request('http://localhost/v1/emails', {
+        body: JSON.stringify(validEmailBody),
+        headers: {
+          Authorization: 'Bearer zs_test_example',
+          'Content-Type': 'application/json',
+        },
+        method: 'POST',
+      })
+    );
+
+    await vi.advanceTimersByTime(SEND_EMAIL_TIMEOUT_MS);
+
+    const response = await responsePromise;
+    expect(response.status).toBe(504);
+    expect(await response.json()).toEqual({
+      error: `Email send timed out after ${SEND_EMAIL_TIMEOUT_MS}ms`,
+    });
+
+    vi.useRealTimers();
   });
 
   it('replays idempotent requests without consuming another rate limit', async () => {

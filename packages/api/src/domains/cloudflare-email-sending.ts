@@ -1,3 +1,5 @@
+import { apiLogger } from '../logging/evlog';
+
 const CF_API_BASE = 'https://api.cloudflare.com/client/v4';
 
 const PERMISSION_HINT =
@@ -85,6 +87,13 @@ async function cfFetch<T>(
   const body = (await response.json()) as CloudflareApiEnvelope<T>;
   if (!body.success) {
     const firstError = body.errors?.[0];
+    apiLogger.warn({
+      action: 'cloudflare_api_error',
+      code: firstError?.code ?? 0,
+      message: firstError?.message ?? 'Cloudflare API request failed',
+      path,
+      status: response.status,
+    });
     throw new CloudflareApiError(
       firstError?.message ?? 'Cloudflare API request failed',
       response.status,

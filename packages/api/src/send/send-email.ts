@@ -1,5 +1,6 @@
 import type { createDb } from '@zerosend/db';
 
+import { apiLogger } from '../logging/evlog';
 import { resolveTemplateForSend } from '../templates/resolve-template-for-send';
 import type { SendEmailBinding } from './email-binding';
 import { MissingFromAddressError } from './errors';
@@ -76,6 +77,14 @@ export async function sendEmail(
     input,
     keyContext.projectId
   );
+
+  apiLogger.info({
+    action: 'send_email',
+    keyType: keyContext.keyType,
+    projectId: keyContext.projectId,
+    templateId: resolvedInput.templateId ?? null,
+    toCount: Array.isArray(resolvedInput.to) ? resolvedInput.to.length : 1,
+  });
 
   if (keyContext.keyType === 'live') {
     if (!options.emailBinding) {

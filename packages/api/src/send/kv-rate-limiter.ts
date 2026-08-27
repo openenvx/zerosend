@@ -2,15 +2,22 @@ import {
   buildRateLimitState,
   getRateLimitWindowReset,
   getRateLimitWindowStart,
+  SEND_RATE_WINDOW_SECONDS,
 } from './rate-limit';
 
 function getRateLimitKvKey(apiKeyId: string, windowStart: number): string {
   return `rl:${apiKeyId}:${windowStart}`;
 }
 
-function getWindowExpirationTtl(nowMs: number, reset: number): number {
+function getRateLimitKvPutOptions(
+  nowMs: number,
+  reset: number
+): KVNamespacePutOptions {
   const nowSeconds = Math.floor(nowMs / 1000);
-  return Math.max(1, reset - nowSeconds);
+  // KV requires expiration at least 60s in the future (TTL or absolute).
+  const expiration = Math.max(reset, nowSeconds + SEND_RATE_WINDOW_SECONDS);
+
+  return { expiration };
 }
 
 function parseCount(value: string | null): number {
@@ -49,9 +56,7 @@ export async function consumeApiKeyRateLimit(
   const key = getRateLimitKvKey(apiKeyId, windowStart);
   const count = parseCount(await kv.get(key)) + 1;
 
-  await kv.put(key, String(count), {
-    expirationTtl: getWindowExpirationTtl(nowMs, reset),
-  });
+  await kv.put(key, String(count), getRateLimitKvPutOptions(nowMs, reset));
 
   return buildRateLimitState(count, reset);
 }

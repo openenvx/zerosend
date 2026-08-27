@@ -1,35 +1,29 @@
 import { OpenAPIHandler } from '@orpc/openapi/fetch';
 import { OpenAPIReferencePlugin } from '@orpc/openapi/plugins';
-import { onError } from '@orpc/server';
-import { RPCHandler } from '@orpc/server/fetch';
 import { ZodToJsonSchemaConverter } from '@orpc/zod/zod4';
 import { createFileRoute } from '@tanstack/react-router';
+import { appRpcHandler } from '@zerosend/api/app-handlers';
 import { createContext } from '@zerosend/api/context';
+import {
+  evlogErrorInterceptor,
+  wrapOrpcHandler,
+} from '@zerosend/api/logging/evlog';
 import { appRouter } from '@zerosend/api/routers/index';
 
-const rpcHandler = new RPCHandler(appRouter, {
-  interceptors: [
-    onError((error) => {
-      console.error(error);
-    }),
-  ],
-});
-
-const apiHandler = new OpenAPIHandler(appRouter, {
-  interceptors: [
-    onError((error) => {
-      console.error(error);
-    }),
-  ],
-  plugins: [
-    new OpenAPIReferencePlugin({
-      schemaConverters: [new ZodToJsonSchemaConverter()],
-    }),
-  ],
-});
+const appOpenAPIHandler = wrapOrpcHandler(
+  new OpenAPIHandler(appRouter, {
+    interceptors: [evlogErrorInterceptor],
+    plugins: [
+      new OpenAPIReferencePlugin({
+        schemaConverters: [new ZodToJsonSchemaConverter()],
+      }),
+    ],
+  }),
+  { include: ['/api/rpc/api-reference/**'] }
+);
 
 async function handle({ request }: { request: Request }) {
-  const rpcResult = await rpcHandler.handle(request, {
+  const rpcResult = await appRpcHandler.handle(request, {
     context: await createContext({ req: request }),
     prefix: '/api/rpc',
   });
@@ -37,7 +31,7 @@ async function handle({ request }: { request: Request }) {
     return rpcResult.response;
   }
 
-  const apiResult = await apiHandler.handle(request, {
+  const apiResult = await appOpenAPIHandler.handle(request, {
     context: await createContext({ req: request }),
     prefix: '/api/rpc/api-reference',
   });

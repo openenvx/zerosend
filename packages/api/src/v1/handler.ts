@@ -1,7 +1,11 @@
 import type { ORPCError } from '@orpc/client';
 import { OpenAPIHandler } from '@orpc/openapi/fetch';
-import { onError } from '@orpc/server';
 
+import {
+  evlogErrorInterceptor,
+  type EvlogOrpcContext,
+  wrapOrpcHandler,
+} from '../logging/evlog';
 import { v1Router } from '../routers/v1/index';
 import {
   createPeekApiKeyRateLimiter,
@@ -107,8 +111,10 @@ function normalizeValidationStatus(response: Response): Response {
   });
 }
 
-export function createV1OpenAPIHandler(): OpenAPIHandler<V1Context> {
-  return new OpenAPIHandler(v1Router, {
+export function createV1OpenAPIHandler(): OpenAPIHandler<
+  V1Context & EvlogOrpcContext
+> {
+  const handler = new OpenAPIHandler(v1Router, {
     adapterInterceptors: [
       async (options) => {
         const result = await options.next();
@@ -129,12 +135,10 @@ export function createV1OpenAPIHandler(): OpenAPIHandler<V1Context> {
       },
     ],
     customErrorResponseBodyEncoder: encodeV1ErrorBody,
-    interceptors: [
-      onError((error) => {
-        console.error(error);
-      }),
-    ],
+    interceptors: [evlogErrorInterceptor],
   });
+
+  return wrapOrpcHandler(handler, { include: ['/v1/**'] });
 }
 
 export const v1OpenAPIHandler = createV1OpenAPIHandler();

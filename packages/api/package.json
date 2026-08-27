@@ -24,6 +24,7 @@
     "@zerosend/db": "workspace:*",
     "@zerosend/env": "workspace:*",
     "drizzle-orm": "^0.45.2",
+    "evlog": "^2.22.4",
     "jose": "^6.2.10",
     "zod": "catalog:"
   },

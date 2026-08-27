@@ -269,6 +269,35 @@ describe('sendEmail live path', () => {
     });
   });
 
+  it('succeeds when the email binding returns no messageId (local simulation)', async () => {
+    const send = vi.fn().mockResolvedValue();
+    const emailBinding: SendEmailBinding = { send };
+    const { mockDb, insertedValues } = createMockDb({});
+
+    const result = await sendEmail(
+      mockDb,
+      {
+        from: 'hello@example.com',
+        html: '<p>Hi</p>',
+        subject: 'Hello',
+        to: ['user@example.com'],
+      },
+      {
+        keyId: 'key-id',
+        keyPrefix: 'zs_live_abc',
+        keyType: 'live',
+        projectId: TEST_PROJECT_ID,
+      },
+      { emailBinding }
+    );
+
+    expect(result.id).toBeDefined();
+    expect(insertedValues[0]).toMatchObject({
+      cloudflareMessageId: null,
+      status: 'sent',
+    });
+  });
+
   it('sends one message with multiple recipients', async () => {
     const send = vi.fn().mockResolvedValue({ messageId: 'cf-msg-multi' });
     const emailBinding: SendEmailBinding = { send };

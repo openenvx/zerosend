@@ -2,6 +2,7 @@ import { ORPCError } from '@orpc/server';
 import { z } from 'zod';
 
 import type { ApiKeyPrincipal } from '../../auth/types';
+import type { EvlogOrpcContext } from '../../logging/evlog';
 import {
   completeIdempotency,
   hashSendRequestBody,
@@ -21,6 +22,11 @@ import {
   UnverifiedFromDomainError,
   type SendEmailInput,
 } from '../../send/send-email';
+import {
+  SEND_EMAIL_TIMEOUT_MS,
+  SendEmailTimeoutError,
+  withTimeout,
+} from '../../send/with-timeout';
 import type { V1Context } from '../../v1-context';
 import { apiKeyProcedure, sendScopeProcedure } from '../../v1-procedures';
 
@@ -50,7 +56,7 @@ function mapHttpStatusToErrorCode(status: number): V1ErrorCode {
     return 'TOO_MANY_REQUESTS';
   }
 
-  if (status === 502) {
+  if (status === 502 || status === 504) {
     return 'BAD_GATEWAY';
   }
 
@@ -102,6 +108,10 @@ function mapSendError(error: unknown): {
     };
   }
 
+  if (error instanceof SendEmailTimeoutError) {
+    return { body: { error: error.message }, status: 504 };
+  }
+
   return { body: { error: 'Internal Server Error' }, status: 500 };
 }
 
@@ -122,7 +132,7 @@ function isPendingIdempotency(
 }
 
 async function handleIdempotencyLookup(
-  context: V1Context,
+  context: V1Context & EvlogOrpcContext,
   principal: ApiKeyPrincipal,
   idempotencyKey: string,
   input: SendEmailInput
@@ -193,6 +203,14 @@ export const v1Router = {
       const principal = context.principal;
       const idempotencyKey = input.headers?.['idempotency-key']?.trim() || null;
 
+      context.log.set({
+        email: {
+          hasIdempotencyKey: Boolean(idempotencyKey),
+          keyType: principal.keyType,
+          toCount: Array.isArray(input.body.to) ? input.body.to.length : 1,
+        },
+      });
+
       let idempotencyLookup: IdempotencyLookupResult | null = null;
       let requestHash: string | null = null;
 
@@ -246,23 +264,31 @@ export const v1Router = {
       const rateLimit = await consume.limit(principal.id);
 
       if (!rateLimit.success) {
+        context.log.warn({
+          action: 'v1.rate_limit_exceeded',
+          apiKeyId: principal.id,
+        });
         throwV1Error(429, { error: 'Rate limit exceeded' });
       }
 
       let outcome: { body: Record<string, unknown>; status: number };
       try {
-        const result = await sendEmail(
-          context.db,
-          input.body,
-          {
-            keyId: principal.id,
-            keyPrefix: principal.keyPrefix,
-            keyType: principal.keyType,
-            projectId: principal.projectId,
-          },
-          { emailBinding: context.emailBinding }
+        const result = await withTimeout(
+          sendEmail(
+            context.db,
+            input.body,
+            {
+              keyId: principal.id,
+              keyPrefix: principal.keyPrefix,
+              keyType: principal.keyType,
+              projectId: principal.projectId,
+            },
+            { emailBinding: context.emailBinding }
+          ),
+          SEND_EMAIL_TIMEOUT_MS
         );
         outcome = { body: { id: result.id }, status: 200 };
+        context.log.set({ email: { logId: result.id, status: 'sent' } });
       } catch (error) {
         if (reservedIdempotency && idempotencyKey) {
           const failure = mapSendError(error);

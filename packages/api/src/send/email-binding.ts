@@ -17,5 +17,5 @@ export interface SendEmailResult {
 }
 
 export interface SendEmailBinding {
-  send(message: SendEmailMessage): Promise<SendEmailResult>;
+  send(message: SendEmailMessage): Promise<SendEmailResult | undefined>;
 }

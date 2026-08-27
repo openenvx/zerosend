@@ -257,6 +257,17 @@ Backdrop uses `--color-overlay`. Panel uses `--color-module-elevated`, 12px radi
 
 Tall dialogs pin header and footer with `shrink-0`, use `flex flex-col max-h-[min(90vh,…)] overflow-hidden` on the panel, and give the body `flex-1 min-h-0 overflow-y-auto`.
 
+### Log detail sheet
+
+The log detail sheet is a quiet inspection surface, not a dense developer console:
+
+- Use the standard `--color-module-elevated` panel surface and a compact `sm:max-w-md` width.
+- Keep the header at `24px` horizontal padding and `20-24px` vertical padding.
+- Separate information groups with hairlines and `32px` vertical section padding. Section headings sit `24px` above their rows.
+- Keep key/value rows aligned in a fixed label column with `16px` row spacing. Identifiers and addresses use monospace text.
+- Copy actions are visually quiet `16px` icon buttons with `12px` icons; increase contrast on hover/focus without adding a colored background.
+- Use standard `sm` buttons for body tabs and secondary actions. Do not introduce oversized controls or status pills.
+
 ## Do's and Don'ts
 
 ### Do
