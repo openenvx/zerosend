@@ -174,9 +174,9 @@ Use `zs_test_` keys to preview in **Mailbox** before live delivery. Subject and 
 
 ## Usage scripts
 
-| Command                          | Description                             |
-| -------------------------------- | --------------------------------------- |
-| `bun run deploy`                 | Build + migrate + deploy product Worker |
-| `bun run deploy:with-migrations` | Remote migrate + deploy                 |
-| `bun run deploy:landing`         | Deploy landing Worker                   |
-| `bun run db:migrate:remote`      | Apply D1 migrations to production D1    |
+| Command                          | Description                           |
+| -------------------------------- | ------------------------------------- |
+| `bun run deploy`                 | Build + deploy + remote D1 migrations |
+| `bun run deploy:with-migrations` | Same as `deploy`                      |
+| `bun run deploy:landing`         | Deploy landing Worker                 |
+| `bun run db:migrate:remote`      | Apply D1 migrations to production D1  |

@@ -39,7 +39,7 @@
     "deploy": "turbo run deploy -F zerosend --",
     "deploy:zerosend": "turbo run deploy -F zerosend --",
     "deploy:landing": "turbo run deploy -F landing --",
-    "deploy:with-migrations": "bun run db:migrate:remote && bun run deploy",
+    "deploy:with-migrations": "bun run deploy",
     "cf-typegen": "turbo run cf-typegen -F zerosend --",
     "db:generate": "turbo run db:generate -F @zerosend/db --",
     "db:migrate:local": "turbo run db:migrate:local -F zerosend --",

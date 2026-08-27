@@ -26,7 +26,7 @@ Most integrations only need the **zerosend** Worker URL.
    | `SESSION_SECRET` | JWT cookie signing (`openssl rand -hex 32`) |
    | `CF_API_TOKEN` | Cloudflare API token for **Domains** onboarding (optional for test sends) |
 
-5. Cloudflare reads [`wrangler.jsonc`](./wrangler.jsonc), **auto-provisions D1**, runs the root `build` + `deploy` scripts (including D1 migrations), and deploys the Worker.
+5. Cloudflare reads [`wrangler.jsonc`](./wrangler.jsonc), **auto-provisions D1**, runs the root `build` + `deploy` scripts (deploy provisions D1, then applies migrations), and deploys the Worker.
 
 **Do not commit** `.dev.vars` or account-specific D1 `database_id` values. The template omits `database_id` so each account gets its own database.
 
@@ -176,8 +176,8 @@ Set `ZEROSEND_URL=https://zerosend.yourdomain.com` in product apps that send mai
 | `bun run dev:all` | Product + landing in parallel |
 | `bun run migrate` | Local D1 migrations (shorthand) |
 | `bun run build` | Build zerosend (Workers Builds / CI) |
-| `bun run deploy` | Build + migrate + deploy zerosend (Deploy button default) |
-| `bun run deploy:with-migrations` | Remote migrate + deploy |
+| `bun run deploy` | Build + deploy zerosend + remote D1 migrations (Deploy button default) |
+| `bun run deploy:with-migrations` | Same as `deploy` |
 | `bun run deploy:zerosend` | Same as `deploy` |
 | `bun run deploy:landing` | Build + deploy landing Worker |
 | `bun run db:generate` | Generate Drizzle migrations after schema changes |
@@ -194,6 +194,8 @@ Set `ZEROSEND_URL=https://zerosend.yourdomain.com` in product apps that send mai
 **401 on `/v1/me`** - use a `zs_test_…` or `zs_live_…` API key from Settings, not the admin token.
 
 **D1 error 7404: database could not be found** - remove any committed `database_id` from `wrangler.jsonc`. D1 IDs are account-specific; the template uses `database_name` only so Cloudflare can provision per account.
+
+**`missing a database_id` on first deploy** - the deploy script runs `wrangler deploy` before remote migrations so D1 is auto-provisioned first. If you run `db:migrate:remote` manually before the first deploy, it will fail until the database exists.
 
 **Deploy button build fails on monorepo** - use the root deploy URL (no `path=`). The product Worker needs the full repo so `@zerosend/*` workspace packages install correctly.
 
