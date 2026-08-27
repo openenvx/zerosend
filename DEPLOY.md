@@ -197,6 +197,8 @@ Set `ZEROSEND_URL=https://zerosend.yourdomain.com` in product apps that send mai
 
 **`missing a database_id` on first deploy** - the deploy script runs `wrangler deploy` before remote migrations so D1 is auto-provisioned first. If you run `db:migrate:remote` manually before the first deploy, it will fail until the database exists.
 
+**Deploy button fails with `CLOUDFLARE_API_TOKEN`** - Workers Builds injects this token for Wrangler. Turbo must pass it through (`globalPassThroughEnv` in `turbo.json`). If you still see the error, open the Worker → **Settings → Builds → API token** and create/select a token, then retry.
+
 **Deploy button build fails on monorepo** - use the root deploy URL (no `path=`). The product Worker needs the full repo so `@zerosend/*` workspace packages install correctly.
 
 **Schema changes** - `bun run db:generate`, commit the new SQL under `packages/db/src/migrations`, then redeploy or `bun run db:migrate:remote`.
