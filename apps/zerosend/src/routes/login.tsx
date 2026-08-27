@@ -11,7 +11,7 @@ export const Route = createFileRoute('/login')({
   loader: async () => {
     const session = await getSession();
     if (session.authenticated) {
-      throw redirect({ to: '/' });
+      throw redirect({ to: '/logs' });
     }
   },
 });
@@ -49,7 +49,7 @@ function LoginForm() {
       }
 
       await router.invalidate();
-      await router.navigate({ to: '/' });
+      await router.navigate({ to: '/logs' });
     } catch {
       setError('Invalid admin token');
     } finally {

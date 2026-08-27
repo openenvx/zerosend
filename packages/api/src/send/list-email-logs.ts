@@ -23,6 +23,7 @@ const listFields = {
   isTest: emailLogs.isTest,
   status: emailLogs.status,
   subject: emailLogs.subject,
+  templateId: emailLogs.templateId,
   toAddress: emailLogs.toAddress,
 };
 

@@ -49,7 +49,7 @@ const primaryNavItems: NavItem[] = [
     exact: true,
     icon: <ScrollText size={16} />,
     label: 'Logs',
-    to: '/',
+    to: '/logs',
   },
   {
     icon: <Inbox size={16} />,
