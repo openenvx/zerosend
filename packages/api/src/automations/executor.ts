@@ -10,6 +10,7 @@ import type { ApiKeyType } from '../auth/types';
 import { apiLogger } from '../logging/evlog';
 import type { SendEmailBinding } from '../send/email-binding';
 import { sendEmail } from '../send/send-email';
+import { resolveTemplateForSend } from '../templates/resolve-template-for-send';
 import {
   delayToMilliseconds,
   getNodeById,
@@ -235,17 +236,22 @@ async function executeNode(
         const subject =
           node.data.subject ??
           `Automation email (${node.data.templateId.slice(0, 8)})`;
+        const variables = interpolateVariables(
+          node.data.variables,
+          context.runPayload
+        );
+        const resolved = await resolveTemplateForSend(context.db, {
+          projectId: context.projectId,
+          subject,
+          templateId: node.data.templateId,
+          variables,
+        });
         const result = await sendEmail(
           context.db,
           {
-            subject,
-            template: {
-              id: node.data.templateId,
-              variables: interpolateVariables(
-                node.data.variables,
-                context.runPayload
-              ),
-            },
+            subject: resolved.subject ?? subject,
+            html: resolved.html,
+            text: resolved.text,
             to: [context.recipientEmail],
           },
           {
@@ -254,7 +260,10 @@ async function executeNode(
             keyType: context.keyType,
             projectId: context.projectId,
           },
-          { emailBinding: context.emailBinding }
+          {
+            emailBinding: context.emailBinding,
+            templateId: resolved.templateId,
+          }
         );
 
         await completeStepRun(context.db, stepRunId, {

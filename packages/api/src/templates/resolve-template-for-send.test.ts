@@ -56,7 +56,7 @@ describe('resolveTemplateForSend', () => {
     ).rejects.toBeInstanceOf(TemplateNotPublishedError);
   });
 
-  it('interpolates published snapshots', async () => {
+  it('interpolates published snapshots by template id', async () => {
     const db = createTemplatesDb([
       {
         htmlSnapshot: '<p>Hello {{{name}}}</p>',
@@ -77,6 +77,28 @@ describe('resolveTemplateForSend', () => {
     expect(result.html).toBe('<p>Hello Ada</p>');
     expect(result.text).toBe('Hello Ada');
     expect(result.subject).toBe('Welcome Ada');
+    expect(result.templateId).toBe('00000000-0000-4000-8000-000000000010');
+  });
+
+  it('interpolates published snapshots by template key', async () => {
+    const db = createTemplatesDb([
+      {
+        htmlSnapshot: '<p>Hi {{{name}}}</p>',
+        id: '00000000-0000-4000-8000-000000000010',
+        projectId: '00000000-0000-4000-8000-000000000001',
+        publishedAt: new Date('2026-01-01T00:00:00.000Z'),
+        textSnapshot: 'Hi {{{name}}}',
+      },
+    ]);
+
+    const result = await resolveTemplateForSend(db as never, {
+      projectId: '00000000-0000-4000-8000-000000000001',
+      templateKey: 'welcome-email',
+      variables: { name: 'Ada' },
+    });
+
+    expect(result.html).toBe('<p>Hi Ada</p>');
+    expect(result.text).toBe('Hi Ada');
     expect(result.templateId).toBe('00000000-0000-4000-8000-000000000010');
   });
 });

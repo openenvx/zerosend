@@ -24,7 +24,7 @@ export function DashboardShell({ children }: DashboardShellProps) {
         <AppSidebar />
         <SidebarInset className="bg-void flex min-h-0 flex-col">
           <main className="flex min-h-0 flex-1 flex-col overflow-auto px-6 py-6 md:px-8">
-            <div className="w-full">{children}</div>
+            <div className="mx-auto w-full max-w-6xl">{children}</div>
           </main>
         </SidebarInset>
       </SidebarProvider>

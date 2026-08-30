@@ -7,12 +7,15 @@ import { interpolateTemplateTokens } from './interpolate-template-tokens';
 
 type Db = ReturnType<typeof createDb>;
 
-export interface ResolveTemplateForSendInput {
+interface ResolveTemplateForSendBase {
   projectId: string;
-  templateId: string;
   variables: Record<string, string>;
   subject?: string;
 }
+
+export type ResolveTemplateForSendInput =
+  | (ResolveTemplateForSendBase & { templateId: string })
+  | (ResolveTemplateForSendBase & { templateKey: string });
 
 export interface ResolvedTemplateSend {
   html: string;
@@ -21,10 +24,28 @@ export interface ResolvedTemplateSend {
   templateId: string;
 }
 
+function getLookup(input: ResolveTemplateForSendInput): {
+  column: 'id' | 'key';
+  value: string;
+} {
+  if ('templateId' in input) {
+    return { column: 'id', value: input.templateId };
+  }
+
+  return { column: 'key', value: input.templateKey };
+}
+
+function getNotFoundIdentifier(input: ResolveTemplateForSendInput): string {
+  return 'templateId' in input ? input.templateId : input.templateKey;
+}
+
 export async function resolveTemplateForSend(
   db: Db,
   input: ResolveTemplateForSendInput
 ): Promise<ResolvedTemplateSend> {
+  const lookup = getLookup(input);
+  const identifier = getNotFoundIdentifier(input);
+
   const [row] = await db
     .select({
       htmlSnapshot: templates.htmlSnapshot,
@@ -35,14 +56,16 @@ export async function resolveTemplateForSend(
     .from(templates)
     .where(
       and(
-        eq(templates.id, input.templateId),
+        lookup.column === 'id'
+          ? eq(templates.id, lookup.value)
+          : eq(templates.key, lookup.value),
         eq(templates.projectId, input.projectId)
       )
     )
     .limit(1);
 
   if (!row) {
-    throw new TemplateNotFoundError(input.templateId);
+    throw new TemplateNotFoundError(identifier);
   }
 
   if (
@@ -50,7 +73,7 @@ export async function resolveTemplateForSend(
     row.htmlSnapshot === null ||
     row.textSnapshot === null
   ) {
-    throw new TemplateNotPublishedError(input.templateId);
+    throw new TemplateNotPublishedError(identifier);
   }
 
   const html = interpolateTemplateTokens(row.htmlSnapshot, input.variables, {

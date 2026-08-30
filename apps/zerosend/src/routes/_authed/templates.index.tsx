@@ -1,5 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Link, createFileRoute, getRouteApi } from '@tanstack/react-router';
+import { slugifyTemplateKey } from '@zerosend/api/templates/template-key';
 import { Button } from '@zerosend/ui/components/button';
 import {
   Dialog,
@@ -9,18 +10,32 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@zerosend/ui/components/dialog';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@zerosend/ui/components/dropdown-menu';
 import { EmptyState } from '@zerosend/ui/components/empty-state';
 import { Input } from '@zerosend/ui/components/input';
 import { Label } from '@zerosend/ui/components/label';
 import { PageHeader } from '@zerosend/ui/components/page-header';
 import { StatusDot } from '@zerosend/ui/components/status-dot';
-import { FileText, Plus, Trash2 } from 'lucide-react';
-import { useState } from 'react';
+import { FileText, MoreHorizontal, Pencil, Plus } from 'lucide-react';
+import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 
 import { orpc } from '@/utils/orpc';
 
 const authedRoute = getRouteApi('/_authed');
+
+interface TemplateListItem {
+  id: string;
+  key: string;
+  name: string;
+  publishedAt: Date | null;
+  updatedAt: Date;
+}
 
 export const Route = createFileRoute('/_authed/templates/')({
   component: TemplatesPage,
@@ -38,7 +53,14 @@ function TemplatesPage() {
 
   const [createOpen, setCreateOpen] = useState(false);
   const [deleteId, setDeleteId] = useState<string | null>(null);
+  const [renameTemplate, setRenameTemplate] = useState<TemplateListItem | null>(
+    null
+  );
   const [templateName, setTemplateName] = useState('');
+  const [templateKey, setTemplateKey] = useState('');
+  const [keyTouched, setKeyTouched] = useState(false);
+  const [renameName, setRenameName] = useState('');
+  const [renameKey, setRenameKey] = useState('');
 
   const createTemplate = useMutation(
     orpc.templates.create.mutationOptions({
@@ -48,9 +70,24 @@ function TemplatesPage() {
       onSuccess: (result) => {
         setCreateOpen(false);
         setTemplateName('');
+        setTemplateKey('');
+        setKeyTouched(false);
         queryClient.invalidateQueries({ queryKey: orpc.templates.list.key() });
         toast.success('Template created');
         navigate({ params: { id: result.id }, to: '/templates/$id' });
+      },
+    })
+  );
+
+  const updateMeta = useMutation(
+    orpc.templates.updateMeta.mutationOptions({
+      onError: (error) => {
+        toast.error(error.message);
+      },
+      onSuccess: () => {
+        setRenameTemplate(null);
+        queryClient.invalidateQueries({ queryKey: orpc.templates.list.key() });
+        toast.success('Template updated');
       },
     })
   );
@@ -68,7 +105,19 @@ function TemplatesPage() {
     })
   );
 
+  useEffect(() => {
+    if (!keyTouched) {
+      setTemplateKey(slugifyTemplateKey(templateName));
+    }
+  }, [keyTouched, templateName]);
+
   const templates = templatesQuery.data ?? [];
+
+  function openRename(template: TemplateListItem) {
+    setRenameTemplate(template);
+    setRenameName(template.name);
+    setRenameKey(template.key);
+  }
 
   return (
     <div className="space-y-6">
@@ -117,7 +166,7 @@ function TemplatesPage() {
                       {template.name}
                     </Link>
                     <p className="text-nav text-muted-foreground font-mono">
-                      {template.id}
+                      {template.key}
                     </p>
                   </td>
                   <td className="px-4 py-3">
@@ -139,6 +188,7 @@ function TemplatesPage() {
                   <td className="px-4 py-3">
                     <div className="flex justify-end gap-2">
                       <Button
+                        aria-label={`Edit ${template.name}`}
                         nativeButton={false}
                         render={
                           <Link
@@ -152,15 +202,41 @@ function TemplatesPage() {
                       >
                         Edit
                       </Button>
-                      <Button
-                        aria-label={`Delete ${template.name}`}
-                        onClick={() => setDeleteId(template.id)}
-                        size="sm"
-                        type="button"
-                        variant="ghost"
-                      >
-                        <Trash2 className="size-4" />
-                      </Button>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger
+                          render={
+                            <Button
+                              aria-label={`Actions for ${template.name}`}
+                              size="sm"
+                              type="button"
+                              variant="ghost"
+                            />
+                          }
+                        >
+                          <MoreHorizontal aria-hidden className="size-4" />
+                          <span className="sr-only">
+                            Actions for {template.name}
+                          </span>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                          <DropdownMenuItem
+                            onClick={() => {
+                              openRename(template);
+                            }}
+                          >
+                            <Pencil className="size-4" />
+                            Rename
+                          </DropdownMenuItem>
+                          <DropdownMenuItem
+                            onClick={() => {
+                              setDeleteId(template.id);
+                            }}
+                            variant="destructive"
+                          >
+                            Delete
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
                     </div>
                   </td>
                 </tr>
@@ -185,9 +261,9 @@ function TemplatesPage() {
             onSubmit={(event) => {
               event.preventDefault();
               createTemplate.mutate({
+                key: templateKey.trim(),
                 name: templateName.trim(),
                 projectId,
-                // Editor seeds createEmailScene() when scene JSON is empty.
                 sceneJson: '{}',
               });
             }}
@@ -203,9 +279,95 @@ function TemplatesPage() {
               />
             </div>
 
+            <div className="space-y-2">
+              <Label htmlFor="template-key">Key</Label>
+              <Input
+                id="template-key"
+                onChange={(event) => {
+                  setKeyTouched(true);
+                  setTemplateKey(event.target.value);
+                }}
+                pattern="[a-z][a-z0-9-]*"
+                placeholder="welcome-email"
+                required
+                title="Lowercase letters, numbers, and hyphens. Must start with a letter."
+                value={templateKey}
+              />
+              <p className="text-nav text-muted-foreground">
+                Used in API sends as{' '}
+                <code className="font-mono">template.key</code>.
+              </p>
+            </div>
+
             <DialogFooter>
               <Button disabled={createTemplate.isPending} type="submit">
                 Create
+              </Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog
+        onOpenChange={(open) => {
+          if (!open) {
+            setRenameTemplate(null);
+          }
+        }}
+        open={renameTemplate !== null}
+      >
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Rename template</DialogTitle>
+            <DialogDescription>
+              Update the display name and API key for this template.
+            </DialogDescription>
+          </DialogHeader>
+
+          <form
+            className="space-y-4"
+            onSubmit={(event) => {
+              event.preventDefault();
+              if (!renameTemplate) {
+                return;
+              }
+              updateMeta.mutate({
+                id: renameTemplate.id,
+                key: renameKey.trim(),
+                name: renameName.trim(),
+                projectId,
+              });
+            }}
+          >
+            <div className="space-y-2">
+              <Label htmlFor="rename-template-name">Name</Label>
+              <Input
+                id="rename-template-name"
+                onChange={(event) => setRenameName(event.target.value)}
+                required
+                value={renameName}
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="rename-template-key">Key</Label>
+              <Input
+                id="rename-template-key"
+                onChange={(event) => setRenameKey(event.target.value)}
+                pattern="[a-z][a-z0-9-]*"
+                required
+                title="Lowercase letters, numbers, and hyphens. Must start with a letter."
+                value={renameKey}
+              />
+              <p className="text-nav text-muted-foreground">
+                Used in API sends as{' '}
+                <code className="font-mono">template.key</code>.
+              </p>
+            </div>
+
+            <DialogFooter>
+              <Button disabled={updateMeta.isPending} type="submit">
+                Save
               </Button>
             </DialogFooter>
           </form>
@@ -225,7 +387,7 @@ function TemplatesPage() {
             <DialogTitle>Delete template</DialogTitle>
             <DialogDescription>
               This removes the draft and published snapshots. Sends using this
-              template id will fail.
+              template key will fail.
             </DialogDescription>
           </DialogHeader>
 

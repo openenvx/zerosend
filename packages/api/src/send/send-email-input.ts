@@ -29,7 +29,12 @@ const toFieldSchema = z
   .transform((to) => dedupeRecipients(Array.isArray(to) ? to : [to]));
 
 export const sendEmailTemplateSchema = z.object({
-  id: z.string().uuid(),
+  key: z
+    .string()
+    .trim()
+    .min(1)
+    .max(64)
+    .regex(/^[a-z][a-z0-9-]*$/),
   variables: z.record(z.string(), z.string()).optional(),
 });
 

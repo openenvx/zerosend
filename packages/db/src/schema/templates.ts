@@ -13,6 +13,7 @@ export const templates = sqliteTable(
     createdAt: integer('created_at', { mode: 'timestamp_ms' }).notNull(),
     htmlSnapshot: text('html_snapshot'),
     id: text('id').primaryKey(),
+    key: text('key').notNull(),
     name: text('name').notNull(),
     projectId: text('project_id')
       .notNull()
@@ -23,6 +24,7 @@ export const templates = sqliteTable(
     updatedAt: integer('updated_at', { mode: 'timestamp_ms' }).notNull(),
   },
   (table) => [
+    uniqueIndex('templates_project_key_unique').on(table.projectId, table.key),
     uniqueIndex('templates_project_name_unique').on(
       table.projectId,
       table.name

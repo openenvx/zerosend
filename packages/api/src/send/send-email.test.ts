@@ -159,7 +159,7 @@ describe('sendEmailInputSchema', () => {
     const result = sendEmailInputSchema.safeParse({
       subject: 'Hello {{{name}}}',
       template: {
-        id: '00000000-0000-4000-8000-000000000010',
+        key: 'welcome-email',
         variables: { name: 'Ada' },
       },
       to: 'user@example.com',
@@ -168,12 +168,25 @@ describe('sendEmailInputSchema', () => {
     expect(result.success).toBe(true);
   });
 
+  it('rejects template sends with id instead of key', () => {
+    const result = sendEmailInputSchema.safeParse({
+      subject: 'Hello',
+      template: {
+        id: '00000000-0000-4000-8000-000000000010',
+        variables: {},
+      },
+      to: 'user@example.com',
+    });
+
+    expect(result.success).toBe(false);
+  });
+
   it('rejects template and html together', () => {
     const result = sendEmailInputSchema.safeParse({
       html: '<p>Hello</p>',
       subject: 'Hello',
       template: {
-        id: '00000000-0000-4000-8000-000000000010',
+        key: 'welcome-email',
         variables: {},
       },
       to: 'user@example.com',

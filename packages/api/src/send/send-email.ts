@@ -37,6 +37,8 @@ export type { SendEmailKeyContext } from './store-test-email';
 
 export interface SendEmailOptions {
   emailBinding?: SendEmailBinding;
+  /** Internal sends (e.g. automations) that resolve by template id before calling sendEmail. */
+  templateId?: string;
 }
 
 async function resolveSendEmailInput(
@@ -51,7 +53,7 @@ async function resolveSendEmailInput(
   const resolved = await resolveTemplateForSend(db, {
     projectId,
     subject: input.subject,
-    templateId: input.template.id,
+    templateKey: input.template.key,
     variables: input.template.variables ?? {},
   });
 
@@ -77,6 +79,10 @@ export async function sendEmail(
     input,
     keyContext.projectId
   );
+
+  if (options.templateId) {
+    resolvedInput.templateId = options.templateId;
+  }
 
   apiLogger.info({
     action: 'send_email',

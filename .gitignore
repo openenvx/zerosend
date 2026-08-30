@@ -21,7 +21,6 @@ local.db-*
 !.dev.vars.example
 
 # Cloudflare / legacy infra
-.alchemy
 .wrangler
 
 # IDEs and editors
