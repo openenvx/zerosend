@@ -10,6 +10,26 @@ export const HOME = {
     label: 'Get started',
     title: 'Your next send is one Worker away.',
   },
+  automations: {
+    body: 'Start with the event that matters, then compose the delivery path around it. Automations will let your products trigger welcome emails, reminders, and follow-ups without adding another workflow service.',
+    label: 'Automations',
+    points: [
+      {
+        body: 'Start workflows from events already happening in your product.',
+        title: 'React to events',
+      },
+      {
+        body: 'Add delays and waits when the message should meet the moment.',
+        title: 'Control timing',
+      },
+    ],
+    status: 'Coming next',
+    title: 'From product events to the right email.',
+    workflowName: 'welcome-sequence',
+    trigger: 'user.created',
+    wait: '2 days',
+    action: 'send_email · welcome',
+  },
   faq: {
     body: 'Everything you need before the first deploy. Still stuck?',
     githubLabel: 'Ask on GitHub',
@@ -83,9 +103,9 @@ export const HOME = {
         title: 'Logs you can read',
       },
       {
-        body: 'Coming next: design reusable email templates in OpenEnvX, publish them, and send with variables from any product.',
+        body: 'Coming next: design reusable, multilingual email templates in OpenEnvX, publish them, and send with variables from any product.',
         id: 'templates',
-        title: 'Reusable templates',
+        title: 'Multilingual templates',
       },
       {
         body: 'Coming next: trigger emails from product events, then add delays and event waits as workflows evolve.',
