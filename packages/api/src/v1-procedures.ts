@@ -41,3 +41,19 @@ export const sendScopeProcedure = apiKeyProcedure.use(({ context, next }) => {
 
   return next();
 });
+
+export const eventsScopeProcedure = apiKeyProcedure.use(({ context, next }) => {
+  const hasEventsScope =
+    context.principal.scopes.includes('events') ||
+    context.principal.scopes.includes('send');
+
+  if (!hasEventsScope) {
+    context.log.warn({
+      action: 'v1.events_scope_missing',
+      scopes: context.principal.scopes,
+    });
+    throw new ORPCError('FORBIDDEN', { message: 'Forbidden' });
+  }
+
+  return next();
+});

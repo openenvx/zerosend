@@ -33,7 +33,7 @@ export const keysRouter = {
         name: input.name,
         prefix: getApiKeyPrefix(rawKey),
         projectId: input.projectId,
-        scopes: JSON.stringify(['send']),
+        scopes: JSON.stringify(['send', 'events']),
       });
 
       return {
@@ -44,7 +44,7 @@ export const keysRouter = {
         name: input.name,
         prefix: getApiKeyPrefix(rawKey),
         projectId: input.projectId,
-        scopes: ['send'],
+        scopes: ['send', 'events'],
       };
     }),
 

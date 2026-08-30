@@ -57,7 +57,7 @@ export function LogDetailSheet({
 
   return (
     <Sheet onOpenChange={(open) => !open && onClose()} open={!!log}>
-      <SheetContent className="bg-popover flex w-full flex-col gap-0 overflow-hidden p-0 shadow-none sm:max-w-md">
+      <SheetContent className="bg-popover flex w-full flex-col gap-0 overflow-hidden p-0 shadow-none data-[side=right]:sm:max-w-4xl">
         {log ? (
           <>
             <SheetHeader className="border-border shrink-0 space-y-2 border-b px-6 py-5 pr-14">

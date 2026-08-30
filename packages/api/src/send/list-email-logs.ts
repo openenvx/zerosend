@@ -1,5 +1,5 @@
 import type { createDb } from '@zerosend/db';
-import { emailLogs } from '@zerosend/db/schema';
+import { emailLogs, templates } from '@zerosend/db/schema';
 import { and, desc, eq } from 'drizzle-orm';
 
 type Db = ReturnType<typeof createDb>;
@@ -24,6 +24,7 @@ const listFields = {
   status: emailLogs.status,
   subject: emailLogs.subject,
   templateId: emailLogs.templateId,
+  templateName: templates.name,
   toAddress: emailLogs.toAddress,
 };
 
@@ -38,6 +39,7 @@ export async function listEmailLogs(db: Db, options: ListEmailLogsOptions) {
   const rows = await db
     .select(listFields)
     .from(emailLogs)
+    .leftJoin(templates, eq(emailLogs.templateId, templates.id))
     .where(and(...conditions))
     .orderBy(desc(emailLogs.createdAt))
     .limit(limit);

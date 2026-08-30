@@ -21,6 +21,7 @@ export interface EmailLogListItem {
   apiKeyPrefix?: string | null;
   cloudflareMessageId?: string | null;
   templateId?: string | null;
+  templateName?: string | null;
   error?: string | null;
   createdAt: Date | number;
 }
@@ -35,28 +36,23 @@ function logStatusTone(status: string): StatusDotTone {
   return status === 'failed' ? 'failed' : 'completed';
 }
 
+function logDisplayLabel(log: EmailLogListItem) {
+  return log.templateName ?? log.subject;
+}
+
 export function LogsTable({ logs, selectedId, onSelect }: LogsTableProps) {
   return (
-    <Table>
+    <Table className="w-full table-fixed">
       <TableHeader>
         <TableRow className="border-border hover:bg-transparent">
-          <TableHead className="text-kbd text-muted-foreground h-auto px-4 py-3">
+          <TableHead className="text-kbd text-muted-foreground h-auto w-[7rem] px-4 py-3">
+            Status
+          </TableHead>
+          <TableHead className="text-kbd text-muted-foreground h-auto w-[9rem] px-4 py-3">
             Time
           </TableHead>
           <TableHead className="text-kbd text-muted-foreground h-auto px-4 py-3">
-            Status
-          </TableHead>
-          <TableHead className="text-kbd text-muted-foreground h-auto px-4 py-3">
-            Type
-          </TableHead>
-          <TableHead className="text-kbd text-muted-foreground h-auto px-4 py-3">
-            Key
-          </TableHead>
-          <TableHead className="text-kbd text-muted-foreground h-auto px-4 py-3">
-            Subject
-          </TableHead>
-          <TableHead className="text-kbd text-muted-foreground h-auto px-4 py-3 pe-4 text-right">
-            To
+            Subject / template
           </TableHead>
         </TableRow>
       </TableHeader>
@@ -75,28 +71,17 @@ export function LogsTable({ logs, selectedId, onSelect }: LogsTableProps) {
               key={log.id}
               onClick={() => onSelect(log.id)}
             >
-              <TableCell className="text-kbd text-muted-foreground px-4 py-3 tabular-nums">
-                {formatLogTime(log.createdAt)}
-              </TableCell>
               <TableCell className="px-4 py-3">
                 <StatusDot
                   label={log.status}
                   tone={logStatusTone(log.status)}
                 />
               </TableCell>
-              <TableCell className="text-body text-muted-foreground px-4 py-3">
-                {log.isTest ? 'Test' : 'Live'}
+              <TableCell className="text-kbd text-muted-foreground px-4 py-3 tabular-nums">
+                {formatLogTime(log.createdAt)}
               </TableCell>
-              <TableCell className="text-kbd text-muted-foreground px-4 py-3 font-mono">
-                {log.apiKeyPrefix ? `${log.apiKeyPrefix}…` : '—'}
-              </TableCell>
-              <TableCell className="text-body text-foreground max-w-md px-4 py-3">
-                <span className="block truncate">{log.subject}</span>
-              </TableCell>
-              <TableCell className="text-kbd text-muted-foreground px-4 py-3 pe-4 text-right font-mono">
-                <span className="block max-w-[200px] truncate">
-                  {log.toAddress}
-                </span>
+              <TableCell className="text-body text-foreground px-4 py-3 pe-4">
+                <span className="block truncate">{logDisplayLabel(log)}</span>
               </TableCell>
             </TableRow>
           );

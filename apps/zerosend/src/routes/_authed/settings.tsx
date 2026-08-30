@@ -11,10 +11,16 @@ import {
 } from '@zerosend/ui/components/dialog';
 import { EmptyState } from '@zerosend/ui/components/empty-state';
 import { Input } from '@zerosend/ui/components/input';
+import {
+  InputGroup,
+  InputGroupAddon,
+  InputGroupButton,
+  InputGroupInput,
+} from '@zerosend/ui/components/input-group';
 import { Label } from '@zerosend/ui/components/label';
 import { PageHeader } from '@zerosend/ui/components/page-header';
 import { StatusDot } from '@zerosend/ui/components/status-dot';
-import { KeyRound, Plus } from 'lucide-react';
+import { CheckIcon, CopyIcon, KeyRound, Plus } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 
@@ -245,28 +251,14 @@ function SettingsPage() {
                   This key is shown once. Store it in your product app secrets.
                 </DialogDescription>
               </DialogHeader>
-              <div className="rounded-[var(--radius-control)] bg-[var(--color-module-hover)] p-3">
-                <code className="text-body text-foreground block font-mono break-all">
-                  {createdKey}
-                </code>
-              </div>
+              <ApiKeyCopyField value={createdKey} />
               <DialogFooter>
-                <Button
-                  onClick={async () => {
-                    await navigator.clipboard.writeText(createdKey);
-                    toast.success('Copied to clipboard');
-                  }}
-                  type="button"
-                >
-                  Copy key
-                </Button>
                 <Button
                   onClick={() => {
                     setCreateOpen(false);
-                    setCreatedKey(null);
+                    resetCreateKeyForm();
                   }}
                   type="button"
-                  variant="outline"
                 >
                   Done
                 </Button>
@@ -372,5 +364,40 @@ function SettingsPage() {
         </DialogContent>
       </Dialog>
     </div>
+  );
+}
+
+function ApiKeyCopyField({ value }: { value: string }) {
+  const [copied, setCopied] = useState(false);
+
+  async function handleCopy() {
+    await navigator.clipboard.writeText(value);
+    toast.success('Copied to clipboard');
+    setCopied(true);
+    window.setTimeout(() => setCopied(false), 1200);
+  }
+
+  return (
+    <InputGroup className="bg-input/50 h-9 rounded-md border-transparent">
+      <InputGroupInput
+        className="font-mono text-sm"
+        onFocus={(event) => event.target.select()}
+        readOnly
+        value={value}
+      />
+      <InputGroupAddon align="inline-end">
+        <InputGroupButton
+          aria-label="Copy API key"
+          onClick={() => void handleCopy()}
+          size="icon-xs"
+        >
+          {copied ? (
+            <CheckIcon className="text-[var(--status-completed)]" />
+          ) : (
+            <CopyIcon />
+          )}
+        </InputGroupButton>
+      </InputGroupAddon>
+    </InputGroup>
   );
 }

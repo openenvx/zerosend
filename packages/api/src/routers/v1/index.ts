@@ -2,6 +2,7 @@ import { ORPCError } from '@orpc/server';
 import { z } from 'zod';
 
 import type { ApiKeyPrincipal } from '../../auth/types';
+import { ingestAutomationEvent } from '../../automations/ingest-event';
 import type { EvlogOrpcContext } from '../../logging/evlog';
 import {
   completeIdempotency,
@@ -28,7 +29,11 @@ import {
   withTimeout,
 } from '../../send/with-timeout';
 import type { V1Context } from '../../v1-context';
-import { apiKeyProcedure, sendScopeProcedure } from '../../v1-procedures';
+import {
+  apiKeyProcedure,
+  eventsScopeProcedure,
+  sendScopeProcedure,
+} from '../../v1-procedures';
 
 type V1ErrorCode =
   | 'BAD_REQUEST'
@@ -316,5 +321,55 @@ export const v1Router = {
       }
 
       return outcome.body;
+    }),
+
+  events: eventsScopeProcedure
+    .route({
+      inputStructure: 'detailed',
+      method: 'POST',
+      path: '/events',
+    })
+    .input(
+      z.object({
+        body: z.object({
+          email: z.string().email(),
+          event: z.string().trim().min(1).max(120),
+          payload: z.record(z.string(), z.unknown()).optional(),
+        }),
+        headers: z
+          .object({
+            'idempotency-key': z.string().trim().max(255).optional(),
+          })
+          .optional(),
+      })
+    )
+    .handler(async ({ context, input }) => {
+      const principal = context.principal;
+      const idempotencyKey = input.headers?.['idempotency-key']?.trim() || null;
+
+      context.log.set({
+        automation: {
+          event: input.body.event,
+          hasIdempotencyKey: Boolean(idempotencyKey),
+        },
+      });
+
+      const result = await ingestAutomationEvent(
+        context.db,
+        principal.projectId,
+        {
+          email: input.body.email,
+          event: input.body.event,
+          idempotencyKey,
+          payload: input.body.payload,
+        },
+        {
+          emailBinding: context.emailBinding,
+          keyType: principal.keyType,
+          nowMs: context.nowMs,
+        }
+      );
+
+      return result;
     }),
 };

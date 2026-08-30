@@ -1,6 +1,7 @@
 import type { RouterClient } from '@orpc/server';
 
 import { publicProcedure } from '../procedures';
+import { automationsRouter } from './automations';
 import { domainsRouter } from './domains';
 import { keysRouter } from './keys';
 import { logsRouter } from './logs';
@@ -10,6 +11,7 @@ import { settingsRouter } from './settings';
 import { templatesRouter } from './templates';
 
 export const appRouter = {
+  automations: automationsRouter,
   domains: domainsRouter,
   healthCheck: publicProcedure.handler(() => 'OK'),
   keys: keysRouter,

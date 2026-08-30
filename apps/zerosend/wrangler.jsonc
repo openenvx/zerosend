@@ -17,7 +17,9 @@
       "migrations_dir": "../../packages/db/src/migrations",
     },
   ],
-  "send_email": [{ "name": "EMAIL" }],
+  "triggers": {
+    "crons": ["* * * * *"],
+  },
   // Omit id for one-click deploy; Cloudflare provisions KV per account.
   "kv_namespaces": [
     {

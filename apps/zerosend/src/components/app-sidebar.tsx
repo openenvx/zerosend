@@ -1,5 +1,4 @@
 import { Link, useRouterState } from '@tanstack/react-router';
-import { Button } from '@zerosend/ui/components/button';
 import {
   Sidebar,
   SidebarContent,
@@ -11,16 +10,9 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-  SidebarRail,
   SidebarSeparator,
-  useSidebar,
 } from '@zerosend/ui/components/sidebar';
 import { sidebarNavButtonClassName } from '@zerosend/ui/components/sidebar-nav-styles';
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from '@zerosend/ui/components/tooltip';
 import { cn } from '@zerosend/ui/lib/utils';
 import {
   FileText,
@@ -67,7 +59,6 @@ const primaryNavItems: NavItem[] = [
     to: '/templates',
   },
   {
-    disabled: true,
     icon: <Workflow size={16} />,
     label: 'Automations',
     to: '/automations',
@@ -126,38 +117,11 @@ function NavList({ items, pathname }: { items: NavItem[]; pathname: string }) {
   );
 }
 
-function SidebarSearch({ collapsed }: { collapsed: boolean }) {
+function SidebarSearch() {
   function handleOpenPalette() {
     toast.message('Search coming soon', {
       description: 'Find a log or template from the command palette.',
     });
-  }
-
-  if (collapsed) {
-    return (
-      <Tooltip>
-        <TooltipTrigger
-          render={
-            <Button
-              aria-label="Search"
-              className="size-8"
-              onClick={handleOpenPalette}
-              size="icon-sm"
-              type="button"
-              variant="ghost"
-            />
-          }
-        >
-          <SearchIcon />
-        </TooltipTrigger>
-        <TooltipContent side="right">
-          Search
-          <kbd className="bg-background/20 ml-1 rounded px-1 text-[10px]">
-            ⌘K
-          </kbd>
-        </TooltipContent>
-      </Tooltip>
-    );
   }
 
   return (
@@ -182,17 +146,15 @@ export function AppSidebar() {
   const pathname = useRouterState({
     select: (state) => state.location.pathname,
   });
-  const { state } = useSidebar();
-  const collapsed = state === 'collapsed';
 
   return (
-    <Sidebar className="border-sidebar-border border-r" collapsible="icon">
-      <SidebarHeader className="gap-3 px-2 py-2 group-data-[collapsible=icon]:items-center group-data-[collapsible=icon]:px-2">
-        <UserMenu collapsed={collapsed} variant="sidebar" />
-        <SidebarSearch collapsed={collapsed} />
+    <Sidebar className="border-sidebar-border border-r" collapsible="none">
+      <SidebarHeader className="gap-3 px-2 py-2">
+        <UserMenu variant="sidebar" />
+        <SidebarSearch />
       </SidebarHeader>
 
-      <SidebarContent className="flex min-h-0 flex-1 flex-col gap-0 overflow-hidden px-2 py-2 group-data-[collapsible=icon]:items-center group-data-[collapsible=icon]:px-2">
+      <SidebarContent className="flex min-h-0 flex-1 flex-col gap-0 overflow-hidden px-2 py-2">
         <SidebarGroup className="shrink-0 p-0">
           <SidebarGroupLabel className="sr-only">Primary</SidebarGroupLabel>
           <SidebarGroupContent>
@@ -210,9 +172,7 @@ export function AppSidebar() {
         </SidebarGroup>
       </SidebarContent>
 
-      <SidebarFooter className="p-2 group-data-[collapsible=icon]:px-2" />
-
-      <SidebarRail />
+      <SidebarFooter className="p-2" />
     </Sidebar>
   );
 }

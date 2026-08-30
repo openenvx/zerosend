@@ -17,7 +17,7 @@
     "check-types": "tsc --noEmit"
   },
   "dependencies": {
-    "@openenvx/email": "0.1.10",
+    "@openenvx/email-studio": "0.1.2",
     "@orpc/client": "catalog:",
     "@orpc/openapi": "catalog:",
     "@orpc/server": "catalog:",

@@ -7,6 +7,7 @@ declare global {
     EMAIL: SendEmail;
     RATE_LIMIT_KV: KVNamespace;
     ADMIN_TOKEN: string;
+    CRON_SECRET?: string;
     SESSION_SECRET: string;
   }
 }

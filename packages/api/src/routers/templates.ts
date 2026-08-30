@@ -1,4 +1,4 @@
-import { renderEmailHtml } from '@openenvx/email/runtime';
+import { renderEmailHtml } from '@openenvx/email-studio/runtime';
 import { ORPCError } from '@orpc/server';
 import { templates } from '@zerosend/db/schema';
 import { and, desc, eq } from 'drizzle-orm';

@@ -138,7 +138,7 @@ Local `wrangler dev` simulates the `EMAIL` binding by default. Add `"remote": tr
 
 ### Templates
 
-Design templates in the dashboard under **Templates** (OpenEnvx visual editor via `@openenvx/email`). **Publish** stores HTML/text snapshots. Send from another project with the template id for the current zerosend project:
+Design templates in the dashboard under **Templates** (OpenEnvx visual editor via `@openenvx/email-studio`). **Publish** stores HTML/text snapshots. Send from another project with the template id for the current zerosend project:
 
 ```bash
 curl -sS "$ZEROSEND_URL/v1/emails" \
