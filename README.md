@@ -2,7 +2,7 @@
 
 Self-hosted email platform on Cloudflare Workers - dashboard, REST API, and D1. Deploy with **Wrangler** or the **Deploy to Cloudflare** button.
 
-[![Deploy to Cloudflare](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/openenvx/zerosend)
+![Deploy to Cloudflare](https://deploy.workers.cloudflare.com/button)
 
 **Full deploy guide:** [DEPLOY.md](./DEPLOY.md)
 
@@ -27,8 +27,8 @@ Or use the setup helper (copies `.dev.vars.example` if missing):
 bun run setup && bun run migrate && bun run dev
 ```
 
-- **Product:** http://localhost:3001 (`bun run dev`)
-- **Landing + docs:** http://localhost:3000 (`bun run dev:landing` or `bun run dev:all`)
+- **Product:** [http://localhost:3001](http://localhost:3001) (`bun run dev`)
+- **Landing + docs:** [http://localhost:3000](http://localhost:3000) (`bun run dev:landing` or `bun run dev:all`)
 
 Sign in at `/login` with your `ADMIN_TOKEN`, then create API keys in **Settings**. Use the sidebar project switcher to namespace keys, logs, mailbox, and templates per product. **Domains** and the default from address stay instance-wide.
 
@@ -61,6 +61,18 @@ See [DEPLOY.md](./DEPLOY.md) for custom domains, landing deploy, and troubleshoo
 - **oRPC** - typed dashboard API
 - **Drizzle + D1** - SQLite at the edge
 - **Wrangler** - standard Cloudflare deploy path for external users
+
+## Roadmap
+
+- [x] One-click deployment to Cloudflare
+- [x] Dashboard, REST API, API keys, and test mailbox
+- [x] Sending domain onboarding and live email delivery
+- [x] Project-scoped templates and event-driven automations
+- [ ] Guided post-deploy onboarding
+- [ ] Versioned upgrades with automatic migration support
+- [ ] `npx zerosend deploy` installer and upgrade CLI
+- [ ] Docker/VPS deployment
+- [ ] Pluggable email delivery providers
 
 ## Project structure
 
